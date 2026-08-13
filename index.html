@@ -1,0 +1,2296 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover">
+    <title>EdgesPay | Ultimate</title>
+    
+    <meta name="apple-mobile-web-app-capable" content="yes">
+    <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
+    <meta name="theme-color" content="#050608">
+
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    
+    <style>
+        :root { color-scheme: dark; }
+        html {
+            background: var(--bg);
+            height: 100%; height: 100dvh;
+            overscroll-behavior: none;
+        }
+        :root {
+            --bg: #050608; --primary: #6366f1;
+            --glass: rgba(255, 255, 255, 0.04);
+            --border: rgba(255, 255, 255, 0.08);
+            --text: #ffffff; --dim: #8e95a2;
+            --up: #00ffbd; --down: #ff3e3e;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; outline: none; transition: background 0.3s ease, transform 0.2s ease; }
+        body { 
+            margin: 0; font-family: 'Inter', sans-serif; background: var(--bg); color: var(--text); 
+            height: 100vh; height: 100dvh; width: 100vw; overflow: hidden; position: fixed; inset: 0;
+            overscroll-behavior: none;
+        }
+
+        .logo-container { display: flex; flex-direction: column; align-items: center; margin-bottom: 20px; animation: float 4s ease-in-out infinite; }
+        @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
+        .main-logo { width: 80px; height: 80px; fill: white; filter: drop-shadow(0 0 15px rgba(99, 102, 241, 0.4)); }
+        .nav-logo { width: 24px; height: 24px; fill: var(--dim); margin-right: 10px; }
+
+        .live-pulse { width: 8px; height: 8px; background: var(--up); border-radius: 50%; display: inline-block; margin-right: 6px; box-shadow: 0 0 8px var(--up); animation: blink 2s infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0.3; } }
+
+        #auth-screen, #lock-screen { position: fixed; inset: 0; background: var(--bg); z-index: 10000; display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 30px; padding-top: max(30px, env(safe-area-inset-top)); padding-bottom: max(30px, env(safe-area-inset-bottom)); }
+        #lock-screen { z-index: 20000; backdrop-filter: blur(25px); display: none; }
+        #app-content { display: none; height: 100vh; flex-direction: column; }
+        main { flex: 1; padding: 25px; padding-top: max(25px, env(safe-area-inset-top)); padding-bottom: 140px; max-width: 480px; margin: 0 auto; width: 100%; overflow-y: auto; scrollbar-width: none; overscroll-behavior-y: contain; }
+        .view { animation: slideUp 0.4s ease-out; }
+        .hidden { display: none !important; }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(20px); } to { opacity: 1; transform: translateY(0); } }
+
+        .card { background: var(--glass); border: 1px solid var(--border); padding: 20px; border-radius: 28px; margin-bottom: 16px; }
+        .chat-scroll { flex: 1; overflow-y: auto; display: flex; flex-direction: column; gap: 10px; padding: 16px 2px; min-height: 0; }
+        .chat-bubble { max-width: 82%; padding: 11px 15px; border-radius: 18px; font-size: 0.85rem; line-height: 1.45; white-space: pre-wrap; word-wrap: break-word; }
+        .chat-bubble.user { align-self: flex-end; background: var(--primary); color: #fff; border-bottom-right-radius: 5px; }
+        .chat-bubble.bot { align-self: flex-start; background: var(--glass); border: 1px solid var(--border); color: var(--text); border-bottom-left-radius: 5px; }
+        .chat-empty { margin: auto; text-align: center; color: var(--dim); font-size: 0.8rem; padding: 30px; }
+        .chat-suggestions { display: flex; gap: 8px; overflow-x: auto; padding: 4px 2px 10px; scrollbar-width: none; }
+        .chat-suggestions::-webkit-scrollbar { display: none; }
+        .chat-chip { flex-shrink: 0; background: var(--glass); border: 1px solid var(--border); color: var(--text); font-size: 0.72rem; padding: 8px 13px; border-radius: 16px; cursor: pointer; white-space: nowrap; }
+        .chat-chip:active { background: var(--primary); color: #fff; }
+        .btn { border: none; padding: 16px; border-radius: 20px; font-weight: 700; cursor: pointer; display: flex; align-items: center; justify-content: center; gap: 8px; font-size: 0.95rem; width: 100%; }
+        .btn-p { background: var(--primary); color: white; }
+        .input { 
+    width: 100%; 
+    background: var(--glass); 
+    border: 1px solid var(--border); 
+    padding: 16px; 
+    border-radius: 16px; 
+    color: white; 
+    margin-top: 10px; 
+    font-size: 1rem; 
+    /* ADD THESE TWO LINES BELOW */
+    color-scheme: dark; 
+    appearance: none; 
+}
+
+
+        select.input {
+            background-image: linear-gradient(45deg, transparent 50%, var(--dim) 50%), linear-gradient(135deg, var(--dim) 50%, transparent 50%);
+            background-position: calc(100% - 20px) center, calc(100% - 15px) center;
+            background-size: 5px 5px, 5px 5px; background-repeat: no-repeat; padding-right: 36px;
+        }
+        select.input option { background: #0b0d13; color: white; }
+
+        body.reduced-motion * { transition-duration: 0.05s !important; animation-duration: 0.05s !important; }
+
+        nav { position: fixed; bottom: max(18px, env(safe-area-inset-bottom)); left: 50%; transform: translateX(-50%); width: clamp(280px, calc(100% - 32px), 460px); z-index: 1000; display: flex; align-items: center; gap: 10px; transition: opacity 0.35s ease, transform 0.45s cubic-bezier(.4,0,.2,1); }
+        nav.nav-hidden { opacity: 0; transform: translateX(-50%) translateY(36px) scale(0.86); pointer-events: none; }
+        .nav-inner { background: rgba(15, 17, 26, 0.4); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border: 1px solid var(--border); border-radius: 32px; display: flex; padding: 6px; flex: 1; min-width: 0; }
+        .n-btn { background: transparent; border: none; color: var(--dim); padding: 9px; border-radius: 24px; flex: 1; cursor: pointer; display: flex; flex-direction: column; align-items: center; font-size: 0.62rem; gap: 3px; }
+        .n-btn.active { color: #fff; background: var(--glass); }
+        .n-btn i { font-size: 1.25rem; }
+
+        /* SEPARATED SEARCH ENTRY POINT */
+        .nav-search-btn {
+            width: 50px; height: 50px; min-width: 50px; border-radius: 50%; flex-shrink: 0;
+            background: rgba(99, 102, 241, 0.16); border: 1px solid rgba(99, 102, 241, 0.4);
+            backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
+            display: flex; align-items: center; justify-content: center;
+            color: var(--primary); font-size: 1.2rem; cursor: pointer; padding: 0;
+        }
+        .nav-search-btn:active { transform: scale(0.92); }
+
+        /* OMNI-SEARCH OVERLAY: drop -> bar -> pills -> detail */
+        .search-overlay { position: fixed; inset: 0; z-index: 9000; pointer-events: none; }
+        .search-overlay.active { pointer-events: auto; }
+        .search-blur-bg {
+            position: absolute; inset: 0; background: rgba(5, 6, 8, 0); backdrop-filter: blur(0px); -webkit-backdrop-filter: blur(0px);
+            transition: background 0.5s ease, backdrop-filter 0.5s ease, -webkit-backdrop-filter 0.5s ease;
+        }
+        .search-overlay.active .search-blur-bg { background: var(--bg); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); }
+
+        .search-drop {
+            position: fixed; top: -40px; left: 50%; width: 16px; height: 16px; border-radius: 50%;
+            background: var(--primary); transform: translateX(-50%); overflow: hidden;
+            display: flex; align-items: center; box-shadow: 0 10px 40px rgba(99, 102, 241, 0.5);
+            transition: width 0.55s cubic-bezier(.34,1.3,.4,1), height 0.55s cubic-bezier(.34,1.3,.4,1),
+                        top 0.55s cubic-bezier(.34,1.3,.4,1), border-radius 0.5s cubic-bezier(.4,0,.2,1),
+                        background 0.4s ease, border-color 0.4s ease;
+        }
+        .search-overlay.active .search-drop {
+            top: max(16px, env(safe-area-inset-top)); width: calc(100% - 32px); height: 58px; border-radius: 29px;
+            background: rgba(15, 17, 26, 0.92); border: 1px solid rgba(99, 102, 241, 0.45);
+        }
+        .search-bar-inner { display: flex; align-items: center; width: 100%; padding: 0 8px 0 18px; gap: 8px; opacity: 0; transition: opacity 0.25s ease 0.3s; white-space: nowrap; }
+        .search-overlay.active .search-bar-inner { opacity: 1; }
+        .search-icon { color: var(--dim); font-size: 1.1rem; flex-shrink: 0; }
+        .search-input { flex: 1; min-width: 0; background: transparent; border: none; outline: none; color: white; font-size: 1rem; padding: 14px 4px; font-family: 'Inter', sans-serif; }
+        .search-input::placeholder { color: var(--dim); }
+        .search-close-btn { width: 34px; height: 34px; border-radius: 50%; background: var(--glass); border: 1px solid var(--border); color: var(--dim); display: flex; align-items: center; justify-content: center; cursor: pointer; flex-shrink: 0; font-size: 0.95rem; }
+
+        .search-results {
+            position: fixed; top: max(96px, calc(env(safe-area-inset-top) + 74px)); left: 0; right: 0; bottom: 0;
+            width: 100%; max-width: 100%; max-height: none; overflow-y: auto; scrollbar-width: none;
+            display: flex; flex-direction: column; gap: 12px; z-index: 9001; padding: 0 16px 40px;
+        }
+        .result-pill {
+            background: rgba(15, 17, 26, 0.75); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px);
+            border: 1px solid var(--border); border-radius: 22px; padding: 14px 18px;
+            display: flex; justify-content: space-between; align-items: center; gap: 12px;
+            cursor: pointer; opacity: 0; transform: translateY(-16px) scale(0.92);
+            animation: pillFloat 0.45s cubic-bezier(.34,1.3,.4,1) forwards;
+        }
+        @keyframes pillFloat { to { opacity: 1; transform: translateY(0) scale(1); } }
+        .result-pill:active { transform: scale(0.97); }
+
+        .search-detail {
+            position: fixed; inset: 0; z-index: 9100; background: rgba(5, 6, 8, 0.97);
+            backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+            display: flex; flex-direction: column; padding: 90px 20px 40px;
+            transform: translateY(100%); transition: transform 0.4s cubic-bezier(.4,0,.2,1);
+            pointer-events: none; overflow-y: auto;
+        }
+        .search-detail.active { transform: translateY(0); pointer-events: auto; }
+        .search-detail-back { background: none; border: none; color: var(--dim); display: flex; align-items: center; gap: 6px; font-size: 0.9rem; cursor: pointer; margin-bottom: 20px; align-self: flex-start; padding: 8px 4px; }
+        .search-detail-card { background: var(--glass); border: 1px solid var(--border); border-radius: 28px; padding: 26px; max-width: 420px; margin: 0 auto; width: 100%; }
+
+        .swatch { width: 44px; height: 44px; border-radius: 12px; cursor: pointer; border: 2px solid transparent; }
+        .swatch.active { border-color: white; transform: scale(1.1); }
+
+        .lp-btn { background: var(--glass); border: 1px solid var(--border); color: var(--dim); padding: 6px 18px; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer; }
+        .lp-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+        /* THEMED DIALOG INTERFACES */
+        .modal-wrap { position: fixed; inset: 0; background: rgba(0,0,0,0.85); backdrop-filter: blur(15px); display: none; align-items: center; justify-content: center; padding: 20px; z-index: 30000; }
+        .modal-box { width: 100%; max-width: 340px; background: #0b0d13; border: 1px solid var(--border); border-radius: 32px; padding: 24px; text-align: center; box-shadow: 0 20px 40px rgba(0,0,0,0.5); }
+
+        /* INTERACTIVE SPOTLIGHT TOUR */
+        /* pointer-events:none on the wrapper lets taps fall straight through to the
+           spotlighted element (e.g. tap & hold the chart, tap the search icon) instead
+           of being swallowed by an invisible full-screen layer. Only the tooltip itself
+           (Next/Skip buttons) needs to remain interactive. */
+        .tour-overlay { position: fixed; inset: 0; z-index: 16000; display: none; pointer-events: none; }
+        .tour-overlay.active { display: block; }
+        .tour-spotlight {
+            position: fixed; top: 50%; left: 50%; width: 0; height: 0; border-radius: 18px;
+            box-shadow: 0 0 0 9999px rgba(5, 6, 8, 0.82);
+            border: 2px solid var(--primary);
+            transition: top 0.45s cubic-bezier(.4,0,.2,1), left 0.45s cubic-bezier(.4,0,.2,1),
+                        width 0.45s cubic-bezier(.4,0,.2,1), height 0.45s cubic-bezier(.4,0,.2,1), opacity 0.3s ease;
+            pointer-events: none; opacity: 1;
+        }
+        .tour-spotlight.no-target { border-color: transparent; }
+        .tour-spotlight.demo-hidden { opacity: 0; }
+        .tour-tooltip {
+            position: fixed; top: 50%; left: 50%; transform: translateX(-50%); width: min(90%, 360px);
+            max-height: calc(100dvh - 40px); overflow-y: auto;
+            background: #0b0d13; border: 1px solid var(--border); border-radius: 24px; padding: 20px;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.5); transition: top 0.45s cubic-bezier(.4,0,.2,1), opacity 0.3s ease;
+            z-index: 16001; pointer-events: auto;
+        }
+        .tour-tooltip.demo-hidden { opacity: 0; pointer-events: none; }
+        .tour-demo-badge {
+            position: fixed; top: max(20px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
+            background: rgba(99,102,241,0.16); border: 1px solid rgba(99,102,241,0.4); color: var(--primary);
+            padding: 8px 16px; border-radius: 20px; font-size: 0.8rem; font-weight: 700;
+            display: none; align-items: center; gap: 6px; z-index: 16002; backdrop-filter: blur(12px);
+            pointer-events: none;
+        }
+        .tour-demo-badge.active { display: flex; }
+
+        /* ADD-TO-HOME-SCREEN HINT: Safari's own toolbar can't be hidden by the page —
+           standalone (home screen) launch is the only way to get true edge-to-edge view */
+        .standalone-hint {
+            position: fixed; top: max(14px, env(safe-area-inset-top)); left: 50%; transform: translateX(-50%);
+            width: calc(100% - 32px); max-width: 440px; z-index: 19000;
+            background: rgba(15, 17, 26, 0.96); border: 1px solid rgba(99, 102, 241, 0.35);
+            backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px);
+            border-radius: 20px; padding: 14px 14px 14px 16px; box-shadow: 0 16px 40px rgba(0,0,0,0.45);
+            display: flex; align-items: center; gap: 12px;
+        }
+        .standalone-hint.hidden { display: none; }
+        .standalone-hint i.hint-icon { font-size: 1.3rem; color: var(--primary); flex-shrink: 0; }
+        .standalone-hint p { margin: 0; font-size: 0.78rem; line-height: 1.4; color: var(--dim); flex: 1; }
+        .standalone-hint p b { color: var(--text); }
+        .standalone-hint .hint-close { background: var(--glass); border: 1px solid var(--border); color: var(--dim); width: 26px; height: 26px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; cursor: pointer; font-size: 0.8rem; padding: 0; }
+
+        /* HEADER MENU (replaces the bare logout icon) */
+        .header-menu-wrap { position: relative; }
+        .header-menu {
+            position: absolute; top: calc(100% + 12px); right: 0; min-width: 200px;
+            background: #0b0d13; border: 1px solid var(--border); border-radius: 18px; padding: 8px;
+            box-shadow: 0 16px 40px rgba(0,0,0,0.5); display: none; flex-direction: column; gap: 2px; z-index: 5000;
+        }
+        .header-menu.active { display: flex; animation: slideUp 0.2s ease-out; }
+        .header-menu-item { display: flex; align-items: center; gap: 10px; background: transparent; border: none; color: var(--text); padding: 12px 14px; border-radius: 12px; font-size: 0.88rem; font-weight: 600; cursor: pointer; width: 100%; text-align: left; }
+        .header-menu-item:active { background: var(--glass); }
+        .header-menu-item.danger { color: var(--down); }
+        .header-menu-divider { height: 1px; background: var(--border); margin: 6px 4px; }
+
+        /* PROFILE PHOTO UPLOAD */
+        .avatar-upload-wrap { position: relative; width: 64px; height: 64px; margin: 0 auto 12px; }
+        .avatar-camera-btn { position: absolute; bottom: -2px; right: -2px; width: 24px; height: 24px; border-radius: 50%; background: var(--primary); border: 2px solid #0b0d13; display: flex; align-items: center; justify-content: center; font-size: 0.7rem; color: white; cursor: pointer; }
+
+        /* OFFLINE / SYNC STATE */
+        .offline-banner { display: flex; align-items: center; justify-content: center; gap: 8px; background: rgba(255, 62, 62, 0.12); border: 1px solid rgba(255, 62, 62, 0.3); color: var(--down); font-size: 0.78rem; font-weight: 600; padding: 10px 14px; border-radius: 16px; margin: 0 0 18px; }
+        .offline-banner.hidden { display: none; }
+        .sync-badge { display: inline-block; font-size: 0.6rem; background: rgba(99, 102, 241, 0.18); color: var(--primary); padding: 2px 7px; border-radius: 8px; margin-left: 6px; font-weight: 700; vertical-align: middle; }
+
+        /* FACE ID */
+        #faceid-unlock-btn { display: flex; align-items: center; justify-content: center; gap: 8px; }
+
+        /* =========================================================
+           MODERN TOGGLE SWITCHES (replaces plain checkboxes)
+        ========================================================= */
+        .switch { position: relative; display: inline-block; width: 46px; height: 28px; flex-shrink: 0; margin-left: 14px; cursor: pointer; }
+        .switch input { opacity: 0; width: 0; height: 0; position: absolute; }
+        .switch .slider { position: absolute; inset: 0; background: rgba(255,255,255,0.12); border-radius: 30px; transition: background 0.25s ease; }
+        .switch .slider::before { content: ''; position: absolute; width: 22px; height: 22px; left: 3px; top: 3px; background: #fff; border-radius: 50%; transition: transform 0.25s cubic-bezier(.4,0,.2,1); box-shadow: 0 2px 6px rgba(0,0,0,0.3); }
+        .switch input:checked + .slider { background: var(--primary); }
+        .switch input:checked + .slider::before { transform: translateX(18px); }
+
+        /* =========================================================
+           SETTINGS — VISUAL REFRESH
+        ========================================================= */
+        #view-settings .card { position: relative; overflow: hidden; }
+        .settings-profile-card { background: linear-gradient(150deg, rgba(99,102,241,0.16) 0%, var(--glass) 60%); border: 1px solid rgba(99,102,241,0.22); padding-top: 26px; }
+        .settings-section-title { display: flex; align-items: center; gap: 12px; margin: 0 0 4px; }
+        .settings-icon-badge { width: 34px; height: 34px; border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 1rem; flex-shrink: 0; }
+        .badge-indigo { background: rgba(99,102,241,0.18); color: var(--primary); }
+        .badge-teal   { background: rgba(0,255,189,0.14); color: var(--up); }
+        .badge-amber  { background: rgba(255,180,60,0.16); color: #ffb43c; }
+        .badge-rose   { background: rgba(255,62,62,0.14); color: var(--down); }
+        .setting-row { display:flex; justify-content:space-between; align-items:center; padding: 12px 0; border-top: 1px solid var(--border); }
+        .setting-row:first-of-type { border-top: none; padding-top: 4px; }
+        .setting-row-text span { font-weight: 600; font-size: 0.92rem; }
+        .setting-row-text p { color: var(--dim); font-size: 0.72rem; margin: 3px 0 0; }
+        #view-settings .card { animation: cardSlide 0.5s cubic-bezier(.4,0,.2,1) both; }
+
+        /* =========================================================
+           ROTATION / LARGE-SCREEN "COOL" TRANSITION EFFECTS
+        ========================================================= */
+        .rotate-flash {
+            position: fixed; inset: 0; z-index: 99999; pointer-events: none; opacity: 0;
+            background: radial-gradient(circle at 50% 50%, rgba(99,102,241,0.35), transparent 65%);
+        }
+        .rotate-flash.play { animation: flashSweep 0.75s ease-out; }
+        @keyframes flashSweep { 0% { opacity: 0; transform: scale(0.7); } 35% { opacity: 1; } 100% { opacity: 0; transform: scale(1.5); } }
+        @keyframes cardSlide { from { opacity: 0; transform: translateY(18px) scale(0.97); } to { opacity: 1; transform: translateY(0) scale(1); } }
+        @keyframes navPop { from { opacity: 0; transform: scale(0.4) translateY(14px); } to { opacity: 1; transform: scale(1) translateY(0); } }
+
+        /* =========================================================
+           SIDEBAR LAYOUT — landscape orientation or large / tablet screens
+        ========================================================= */
+        nav { transition: opacity 0.35s ease, transform 0.5s cubic-bezier(.4,0,.2,1), left 0.5s cubic-bezier(.4,0,.2,1), bottom 0.5s cubic-bezier(.4,0,.2,1), top 0.5s cubic-bezier(.4,0,.2,1), width 0.5s cubic-bezier(.4,0,.2,1), height 0.5s cubic-bezier(.4,0,.2,1), border-radius 0.5s ease; }
+        main { transition: margin-left 0.5s cubic-bezier(.4,0,.2,1), max-width 0.5s ease, padding 0.4s ease; }
+
+        @media (min-width: 760px) {
+            body.wide-layout #app-content { flex-direction: row; }
+            body.wide-layout nav {
+                top: 0; bottom: 0; left: 0; transform: none; width: 104px; height: 100vh;
+                flex-direction: column; align-items: center; justify-content: flex-start; gap: 22px;
+                padding: max(28px, env(safe-area-inset-top)) 0 24px;
+                background: rgba(9, 10, 16, 0.55); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px);
+                border-right: 1px solid var(--border);
+            }
+            body.wide-layout .nav-inner {
+                flex-direction: column; background: transparent; border: none; padding: 0; gap: 10px; width: 100%;
+                backdrop-filter: none; -webkit-backdrop-filter: none;
+            }
+            body.wide-layout .n-btn { flex-direction: column; width: 76px; padding: 12px 6px; font-size: 0.66rem; animation: navPop 0.5s cubic-bezier(.34,1.56,.64,1) both; }
+            body.wide-layout .n-btn i { font-size: 1.4rem; }
+            body.wide-layout .nav-search-btn { position: static; margin-top: auto; animation: navPop 0.55s 0.1s cubic-bezier(.34,1.56,.64,1) both; }
+            body.wide-layout main { margin-left: 104px; max-width: 640px; padding: 40px max(25px, env(safe-area-inset-top)) 60px 40px; }
+        }
+        @media (min-width: 1080px) {
+            body.wide-layout main { max-width: 780px; }
+        }
+    </style>
+</head>
+<body>
+
+<div id="u-alert" class="modal-wrap">
+    <div class="modal-box">
+        <h3 id="u-alert-title" style="margin: 0 0 10px;">Alert</h3>
+        <p id="u-alert-msg" style="color: var(--dim); font-size: 0.95rem; margin: 0 0 24px; line-height: 1.4;"></p>
+        <button class="btn btn-p" onclick="closeAlert()">Acknowledge</button>
+    </div>
+</div>
+
+<div id="u-confirm" class="modal-wrap">
+    <div class="modal-box">
+        <h3 id="u-confirm-title" style="margin: 0 0 10px; color: var(--down);">Confirmation</h3>
+        <p id="u-confirm-msg" style="color: var(--dim); font-size: 0.95rem; margin: 0 0 24px; line-height: 1.4;"></p>
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <button id="u-confirm-yes" class="btn btn-p">Confirm</button>
+            <button class="btn" style="background: var(--glass); color: white;" onclick="closeConfirm()">Cancel</button>
+        </div>
+    </div>
+</div>
+
+<div id="u-prompt" class="modal-wrap">
+    <div class="modal-box">
+        <h3 id="u-prompt-title" style="margin: 0 0 10px;">Security Vault</h3>
+        <p id="u-prompt-msg" style="color: var(--dim); font-size: 0.95rem; margin: 0 0 15px;"></p>
+        <input type="password" id="u-prompt-input" class="input" style="text-align: center; font-size: 1.5rem; margin-bottom: 24px;" maxlength="4" inputmode="numeric">
+        <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+            <button id="u-prompt-submit" class="btn btn-p">Set PIN</button>
+            <button class="btn" style="background: var(--glass); color: white;" onclick="closePrompt()">Abort</button>
+        </div>
+    </div>
+</div>
+
+<div id="modal-chart-detail" style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:13000; padding:20px; backdrop-filter: blur(20px);">
+    <div class="card" style="width:100%; max-width:380px; max-height:85vh; overflow-y:auto;">
+        <h3 style="text-align:center; margin-top:0;">Spending Breakdown</h3>
+        <div style="height:240px; position:relative;"><canvas id="logsChartExpanded"></canvas></div>
+        <div id="chart-detail-stats" style="margin-top:20px;"></div>
+        <button class="btn" style="background:transparent; color:var(--dim); margin-top:15px;" onclick="closeChartDetail()">Close</button>
+    </div>
+</div>
+
+<div class="tour-overlay" id="tour-overlay">
+    <div class="tour-spotlight" id="tour-spotlight"></div>
+    <div class="tour-demo-badge" id="tour-demo-badge"><i class="ph-bold ph-cursor-click"></i> Watching a live demo…</div>
+    <div class="tour-tooltip" id="tour-tooltip">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:10px;">
+            <div id="tour-icon" style="width:34px; height:34px; border-radius:10px; background:rgba(99,102,241,0.15); display:flex; align-items:center; justify-content:center; color:var(--primary); font-size:1.1rem; flex-shrink:0;"></div>
+            <h3 id="tour-title" style="margin:0; font-size:1.05rem;"></h3>
+        </div>
+        <p id="tour-msg" style="color:var(--dim); font-size:0.88rem; line-height:1.5; margin:0 0 16px;"></p>
+        <div id="tour-dots" style="display:flex; gap:5px; margin-bottom:16px;"></div>
+        <div style="display:flex; gap:10px;">
+            <button id="tour-skip-btn" class="btn" style="background:var(--glass); color:var(--dim); flex:0 0 auto; width:auto; padding:14px 18px;" onclick="skipTour()">Skip</button>
+            <button id="tour-next-btn" class="btn btn-p" style="flex:1;" onclick="nextTourStep()">Next</button>
+        </div>
+    </div>
+</div>
+
+<div class="standalone-hint hidden" id="standalone-hint">
+    <i class="ph-bold ph-export hint-icon"></i>
+    <p>For a true full-screen view with <b>no browser bar</b>, tap <b>Share</b> below, then <b>Add to Home Screen</b>.</p>
+    <button class="hint-close" onclick="dismissStandaloneHint()" aria-label="Dismiss"><i class="ph-bold ph-x"></i></button>
+</div>
+
+<div id="lock-screen">
+    <i class="ph-fill ph-lock-keyhole" style="font-size: 4rem; color: var(--primary); margin-bottom: 20px;"></i>
+    <h2 style="margin:0;">Vault Locked</h2>
+    <p style="color:var(--dim); margin-bottom: 30px;">Enter your 4-digit PIN</p>
+    <input type="password" id="pin-entry" maxlength="4" class="input" style="width:160px; text-align:center; font-size:2.5rem; letter-spacing:10px;" inputmode="numeric">
+    <button class="btn btn-p" style="margin-top:30px; width:160px;" onclick="verifyPin()">Unlock</button>
+    <button id="faceid-unlock-btn" class="btn" style="display:none; margin-top:14px; width:160px; background:var(--glass); color:var(--text);" onclick="unlockWithFaceID()"><i class="ph-bold ph-scan-smiley"></i> Face ID</button>
+</div>
+
+<div id="auth-screen">
+    <div class="logo-container">
+        <svg class="main-logo" viewBox="0 0 100 100">
+            <rect x="35" y="15" width="30" height="45" rx="2" />
+            <rect x="15" y="25" width="70" height="20" rx="2" />
+            <rect x="15" y="70" width="70" height="12" rx="2" />
+            <rect x="35" y="85" width="30" height="8" rx="2" />
+        </svg>
+    </div>
+
+    <div id="login-form" class="auth-card" style="text-align: center; width: 100%; max-width: 320px;">
+        <h1 style="font-size: 3rem; margin:0; font-weight:800;">EdgesPay</h1>
+        <p style="color:var(--dim); margin-bottom: 40px;">Cloud Ledger v2.0</p>
+        <input type="text" id="log-user" class="input" placeholder="Username" autocomplete="username" oninput="handleLoginUsernameInput()">
+        <p id="login-username-hint" style="color:var(--down); font-size:0.75rem; min-height:14px; margin:8px 0 0; text-align:left;"></p>
+
+        <div id="login-password-section" class="hidden">
+            <input type="password" id="log-pass" class="input" placeholder="Password" autocomplete="current-password">
+            <button class="btn btn-p" style="margin-top:25px;" onclick="handleAuth('login')">Open Account</button>
+        </div>
+
+        <button id="login-passkey-btn" class="btn hidden" style="margin-top:15px; background:var(--glass); color:var(--text);" onclick="signInWithPasskey()"><i class="ph-bold ph-key"></i> Sign in with Passkey</button>
+
+        <p onclick="toggleAuth()" style="margin-top: 30px; color: var(--dim); cursor:pointer;">New member? <span style="color:var(--primary)">Join now</span></p>
+    </div>
+    <div id="signup-form" class="auth-card hidden" style="text-align: center; width: 100%; max-width: 320px;">
+        <h2>Join EdgesPay</h2>
+        <input type="text" id="sign-user" class="input" placeholder="Desired Username">
+        <input type="password" id="sign-pass" class="input" placeholder="Secure Password">
+        <button class="btn btn-p" style="margin-top:25px;" onclick="handleAuth('signup')">Create Vault</button>
+        <p onclick="toggleAuth()" style="margin-top: 30px; color: var(--dim); cursor:pointer;">Already a member? <span style="color:var(--primary)">Login</span></p>
+    </div>
+</div>
+
+<div id="app-content">
+    <main>
+        <header style="display:flex; justify-content:space-between; align-items:center; margin-bottom:30px;">
+            <div style="display: flex; align-items: center;">
+                <svg class="nav-logo" viewBox="0 0 100 100">
+                    <rect x="35" y="15" width="30" height="45" />
+                    <rect x="15" y="25" width="70" height="20" />
+                    <rect x="15" y="70" width="70" height="12" />
+                    <rect x="35" y="85" width="30" height="8" />
+                </svg>
+                <div><span class="live-pulse" id="conn-pulse"></span><small id="conn-label" style="font-weight:700; color:var(--dim);">LIVE</small></div>
+            </div>
+            <h4 id="view-title" style="margin:0; letter-spacing:2px; color:var(--dim);">DASHBOARD</h4>
+            <div class="header-menu-wrap">
+                <i class="ph-bold ph-dots-three-vertical" onclick="toggleHeaderMenu(event)" style="color:var(--dim); font-size: 1.4rem; cursor: pointer;"></i>
+                <div class="header-menu" id="header-menu">
+                    <button class="header-menu-item" onclick="closeHeaderMenu(); navTo('settings', document.getElementById('nav-btn-settings'))"><i class="ph-bold ph-user-gear"></i> Settings</button>
+                    <button class="header-menu-item" onclick="closeHeaderMenu(); exportTransactionsCSV()"><i class="ph-bold ph-download-simple"></i> Export Data</button>
+                    <div class="header-menu-divider"></div>
+                    <button class="header-menu-item danger" onclick="closeHeaderMenu(); logout()"><i class="ph-bold ph-power"></i> Log Out</button>
+                </div>
+            </div>
+        </header>
+
+        <div class="offline-banner hidden" id="offline-banner"><i class="ph-bold ph-wifi-slash"></i> Offline — changes will sync automatically when you're back online</div>
+
+        <div id="view-home" class="view">
+            <div class="card" id="tour-balance-card" style="text-align:center; background: linear-gradient(180deg, rgba(255,255,255,0.03) 0%, transparent 100%);">
+                <p style="color:var(--dim); font-size: 0.8rem; display:flex; align-items:center; justify-content:center; gap:6px;">TOTAL BALANCE <i class="ph-bold ph-eye" id="bal-eye-icon" onclick="toggleBalanceVisibility()" style="cursor:pointer; font-size:0.95rem;"></i></p>
+                <h1 id="bal-display" style="font-size: clamp(1.8rem, 9vw, 3.5rem); margin: 5px 0 20px; font-weight:800; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; max-width: 100%; padding: 0 8px;">GHC0.00</h1>
+                <div style="height: 120px; position: relative;"><canvas id="mainChart"></canvas></div>
+            </div>
+            <div id="income-expense-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px;">
+                <button class="btn" style="background: rgba(0, 255, 189, 0.1); color: var(--up);" onclick="openEntry('earn')"><i class="ph-bold ph-trend-up"></i> Earn</button>
+                <button class="btn" style="background: rgba(255, 62, 62, 0.1); color: var(--down);" onclick="openEntry('withdraw')"><i class="ph-bold ph-trend-down"></i> Withdraw</button>
+            </div>
+            <h4 style="margin: 30px 0 15px;">Recent Transactions</h4>
+            <div id="home-recent"></div>
+        </div>
+
+          <div id="view-history" class="view hidden">
+    <div class="card" id="logs-chart-card" style="text-align:center; cursor:pointer; user-select:none;">
+        <p style="color:var(--dim); font-size: 0.75rem; margin: 0 0 12px; letter-spacing:1px;">INCOME VS EXPENSE</p>
+        <div style="display:flex; justify-content:center; gap:8px; margin-bottom: 14px;">
+            <button class="lp-btn" data-period="daily" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="event.stopPropagation(); setLogsChartPeriod('daily', this)">D</button>
+            <button class="lp-btn" data-period="weekly" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="event.stopPropagation(); setLogsChartPeriod('weekly', this)">W</button>
+            <button class="lp-btn active" data-period="monthly" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="event.stopPropagation(); setLogsChartPeriod('monthly', this)">M</button>
+            <button class="lp-btn" data-period="yearly" onmousedown="event.stopPropagation()" ontouchstart="event.stopPropagation()" onclick="event.stopPropagation(); setLogsChartPeriod('yearly', this)">Y</button>
+        </div>
+        <div style="height: 160px; position: relative;"><canvas id="logsChart"></canvas></div>
+        <p style="color:var(--dim); font-size: 0.65rem; margin: 12px 0 0; display:flex; align-items:center; justify-content:center; gap:5px;"><i class="ph-bold ph-hand-tap"></i> Tap & hold for full breakdown</p>
+    </div>
+    <div id="full-history"></div>
+</div>
+
+        <div id="view-chat" class="view hidden" style="display:flex; flex-direction:column; height: calc(100vh - 250px); min-height: 340px;">
+            <div class="card" style="display:flex; align-items:center; gap:10px; padding:14px 18px;">
+                <div style="width:38px; height:38px; border-radius:50%; background:var(--primary); display:flex; align-items:center; justify-content:center; flex-shrink:0;"><i class="ph-bold ph-sparkle" style="color:#fff; font-size:1.1rem;"></i></div>
+                <div style="min-width:0;">
+                    <div style="font-weight:700; font-size:0.9rem;">Finance Assistant</div>
+                    <div style="color:var(--dim); font-size:0.7rem;">Runs on this device · answers from your synced data</div>
+                </div>
+                <i class="ph-bold ph-trash" id="chat-clear-btn" onclick="clearChat()" style="margin-left:auto; color:var(--dim); cursor:pointer; font-size:1.1rem;"></i>
+            </div>
+            <div id="chat-messages" class="chat-scroll"></div>
+            <div id="chat-suggestions" class="chat-suggestions"></div>
+            <div style="display:flex; gap:8px; align-items:center; padding-top:6px;">
+                <input type="text" id="chat-input" class="input" placeholder="Ask about your balance, earnings, spending…" style="margin:0; flex:1;" onkeydown="if(event.key==='Enter'){ event.preventDefault(); sendChatMessage(); }">
+                <button class="btn" style="width:50px; height:50px; flex:none; padding:0; background:var(--primary); color:#fff; margin-top:0;" onclick="sendChatMessage()"><i class="ph-bold ph-paper-plane-tilt"></i></button>
+            </div>
+        </div>
+
+        <div id="view-settings" class="view hidden">
+            <div class="card settings-profile-card" style="text-align:center;">
+                <div class="avatar-upload-wrap">
+                    <div id="profile-avatar" style="width:64px; height:64px; border-radius:50%; background:var(--primary); display:flex; align-items:center; justify-content:center; font-size:1.6rem; font-weight:800; overflow:hidden;">U</div>
+                    <label for="avatar-file-input" class="avatar-camera-btn" aria-label="Change profile photo"><i class="ph-bold ph-camera"></i></label>
+                    <input type="file" id="avatar-file-input" accept="image/*" style="display:none;" onchange="handleAvatarUpload(event)">
+                </div>
+                <h3 id="current-username-display" style="margin:0 0 4px;">User</h3>
+                <p style="color:var(--dim); font-size:0.7rem; margin:0 0 20px;">Photo is stored on this device only.</p>
+                <div style="text-align:left;">
+                    <input type="text" id="edit-username" class="input" placeholder="Update Name">
+                    <input type="password" id="edit-password" class="input" placeholder="New Password (Leave blank to keep)">
+                </div>
+                <button class="btn btn-p" style="margin-top:15px;" onclick="updateProfile()"><i class="ph-bold ph-user-circle"></i> Update Credentials</button>
+            </div>
+
+            <div class="card" id="tour-pref-card">
+                <div class="settings-section-title"><div class="settings-icon-badge badge-indigo"><i class="ph-bold ph-sliders-horizontal"></i></div><div><h3 style="margin:0;">Preferences</h3><p style="color:var(--dim); font-size:0.78rem; margin: 2px 0 0;">Tune how EdgesPay looks and behaves for you.</p></div></div>
+                <div style="height:16px;"></div>
+
+                <label style="display:block; color:var(--dim); font-size:0.75rem; margin-bottom:6px;">Currency</label>
+                <select id="currency-select" class="input" onchange="changeCurrency(this.value)" style="margin-top:0; margin-bottom:18px;">
+                    <option value="GHC">GHC — Ghanaian Cedi</option>
+                    <option value="$">$ — US Dollar</option>
+                    <option value="€">€ — Euro</option>
+                    <option value="£">£ — British Pound</option>
+                    <option value="₦">₦ — Nigerian Naira</option>
+                    <option value="KSh">KSh — Kenyan Shilling</option>
+                    <option value="R">R — South African Rand</option>
+                </select>
+
+                <label style="display:block; color:var(--dim); font-size:0.75rem; margin-bottom:6px;">Open app to</label>
+                <select id="default-tab-select" class="input" onchange="changeDefaultTab(this.value)" style="margin-top:0; margin-bottom:18px;">
+                    <option value="home">Home</option>
+                    <option value="history">Logs</option>
+                    <option value="chat">Chat</option>
+                    <option value="settings">Settings</option>
+                </select>
+
+                <div class="setting-row" style="margin-bottom:0;">
+                    <div class="setting-row-text">
+                        <span>Hide balance by default</span>
+                        <p>Keeps your total balance masked until you tap to reveal it.</p>
+                    </div>
+                    <label class="switch"><input type="checkbox" id="hide-balance-toggle" onchange="toggleBalanceVisibility()"><span class="slider"></span></label>
+                </div>
+
+                <div class="setting-row">
+                    <div class="setting-row-text">
+                        <span>Reduce motion</span>
+                        <p>Shortens animations across search, charts, and the tour.</p>
+                    </div>
+                    <label class="switch"><input type="checkbox" id="reduce-motion-toggle" onchange="toggleReducedMotion(this.checked)"><span class="slider"></span></label>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="settings-section-title"><div class="settings-icon-badge badge-teal"><i class="ph-bold ph-palette"></i></div><div><h3 style="margin:0;">Appearance</h3><p style="color:var(--dim); font-size:0.78rem; margin: 2px 0 0;">Current theme: <span id="active-theme-name" style="color:var(--text); font-weight:600;">Midnight</span></p></div></div>
+                <div style="height:16px;"></div>
+                <div style="display:flex; gap:12px; flex-wrap:wrap;">
+                    <div onclick="changeTheme('#050608', this, 'Midnight')" class="swatch active" data-name="Midnight" style="background:#050608; border:1px solid var(--border);"></div>
+                    <div onclick="changeTheme('#1a1c2c', this, 'Indigo Night')" class="swatch" data-name="Indigo Night" style="background:#1a1c2c;"></div>
+                    <div onclick="changeTheme('#0f172a', this, 'Deep Slate')" class="swatch" data-name="Deep Slate" style="background:#0f172a;"></div>
+                    <div onclick="changeTheme('#2d1b36', this, 'Royal Plum')" class="swatch" data-name="Royal Plum" style="background:#2d1b36;"></div>
+                    <div onclick="changeTheme('#0b1f1c', this, 'Forest')" class="swatch" data-name="Forest" style="background:#0b1f1c;"></div>
+                    <div onclick="changeTheme('#1f1207', this, 'Cocoa')" class="swatch" data-name="Cocoa" style="background:#1f1207;"></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="settings-section-title"><div class="settings-icon-badge badge-rose"><i class="ph-bold ph-shield-check"></i></div><h3 style="margin:0;">Security</h3></div>
+                <div style="height:16px;"></div>
+                <div class="setting-row" style="margin-bottom:0;">
+                    <div class="setting-row-text"><span>PIN Lock Protection</span><p>Require a 4-digit PIN whenever EdgesPay opens.</p></div>
+                    <label class="switch"><input type="checkbox" id="security-toggle" onchange="fireSecuritySetup(this.checked)"><span class="slider"></span></label>
+                </div>
+                <button id="change-pin-btn" class="btn" style="background:var(--glass); color:var(--text); margin-top:15px; display:none;" onclick="changePin()"><i class="ph-bold ph-key"></i> Change PIN</button>
+
+                <div id="faceid-row" class="setting-row" style="display:none;">
+                    <div class="setting-row-text">
+                        <span><i class="ph-bold ph-scan-smiley" style="margin-right:6px;"></i>Face ID Unlock</span>
+                        <p>Use Face ID — or your device's own sign-in app — instead of your PIN to unlock EdgesPay.</p>
+                    </div>
+                    <label class="switch"><input type="checkbox" id="faceid-toggle" onchange="toggleFaceID(this.checked)"><span class="slider"></span></label>
+                </div>
+
+                <div id="passkey-row" class="setting-row" style="display:none;">
+                    <div class="setting-row-text">
+                        <span><i class="ph-bold ph-key" style="margin-right:6px;"></i>Passkey Sign-In</span>
+                        <p>Skip your password on the login screen using Face ID, Touch ID, or Windows Hello on this device.</p>
+                    </div>
+                    <label class="switch"><input type="checkbox" id="passkey-toggle" onchange="togglePasskey(this.checked)"><span class="slider"></span></label>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="settings-section-title"><div class="settings-icon-badge badge-indigo"><i class="ph-bold ph-export"></i></div><h3 style="margin:0;">Your Data</h3></div>
+                <p style="color:var(--dim); font-size:0.8rem; margin: 10px 0 15px;">Download a copy of every transaction in your vault.</p>
+                <button class="btn" style="background:var(--glass); color:var(--text);" onclick="exportTransactionsCSV()"><i class="ph-bold ph-download-simple"></i> Export as CSV</button>
+            </div>
+
+            <div class="card">
+                <div class="settings-section-title"><div class="settings-icon-badge badge-teal"><i class="ph-bold ph-question"></i></div><h3 style="margin:0;">Help</h3></div>
+                <p style="color:var(--dim); font-size:0.8rem; margin: 10px 0 15px;">Need a refresher on how EdgesPay works?</p>
+                <button class="btn" style="background:var(--glass); color:var(--text);" onclick="startOnboarding()"><i class="ph-bold ph-compass"></i> Replay Welcome Tour</button>
+            </div>
+
+            <div class="card" style="border: 1px solid rgba(255, 62, 62, 0.2); margin-top: 30px;">
+                <h3 style="color: var(--down); margin-top:0; display:flex; align-items:center; gap:8px;"><i class="ph-bold ph-warning"></i> Danger Zone</h3>
+                <p style="color: var(--dim); font-size: 0.8rem;">Permanently delete your vault and all history.</p>
+                <button class="btn" style="background: rgba(255, 62, 62, 0.1); color: var(--down);" onclick="deleteAccount()">Delete Account</button>
+            </div>
+
+            <p style="text-align:center; color:var(--dim); font-size:0.7rem; margin-top:20px; opacity:0.6;">EdgesPay Cloud Ledger v2.0</p>
+        </div>
+    </main>
+
+    <nav>
+        <div class="nav-inner">
+            <button class="n-btn active" id="nav-btn-home" onclick="navTo('home', this)"><i class="ph-bold ph-house"></i>Home</button>
+            <button class="n-btn" id="nav-btn-history" onclick="navTo('history', this)"><i class="ph-bold ph-clock"></i>Logs</button>
+            <button class="n-btn" id="nav-btn-chat" onclick="navTo('chat', this)"><i class="ph-bold ph-chat-circle-text"></i>Chat</button>
+            <button class="n-btn" id="nav-btn-settings" onclick="navTo('settings', this)"><i class="ph-bold ph-user-gear"></i>Set</button>
+        </div>
+        <button class="nav-search-btn" id="nav-search-btn" onclick="openOmniSearch()" aria-label="Search transactions"><i class="ph-bold ph-magnifying-glass"></i></button>
+    </nav>
+</div>
+
+<div class="search-overlay" id="search-overlay">
+    <div class="search-blur-bg"></div>
+    <div class="search-drop" id="search-drop">
+        <div class="search-bar-inner">
+            <i class="ph-bold ph-magnifying-glass search-icon"></i>
+            <input type="text" id="omni-search-input" class="search-input" placeholder="Search earnings or withdrawals…" autocomplete="off" oninput="runOmniSearch()">
+            <button class="search-close-btn" onclick="closeOmniSearch()" aria-label="Close search"><i class="ph-bold ph-x"></i></button>
+        </div>
+    </div>
+    <div class="search-results" id="search-results-pills"></div>
+    <div class="search-detail" id="search-detail-panel">
+        <button class="search-detail-back" onclick="closeSearchDetail()"><i class="ph-bold ph-arrow-left"></i> Back to results</button>
+        <div class="search-detail-card" id="search-detail-content"></div>
+    </div>
+</div>
+
+<div id="modal-entry" style="position:fixed; inset:0; background:rgba(0,0,0,0.9); display:none; align-items:center; justify-content:center; z-index:11000; padding:20px; backdrop-filter: blur(15px);">
+    <div class="card" style="width:100%; max-width:360px;">
+        <h3 id="entry-title" style="text-align:center;">Transaction</h3>
+        <input type="number" id="entry-amt" class="input" placeholder="0.00" style="font-size: 3rem; text-align:center; background:transparent; border:none;" inputmode="decimal">
+        <input type="text" id="entry-note" class="input" placeholder="What was this for?">
+        
+        <input type="date" id="entry-date" class="input" style="color-scheme: dark; text-align: center;">
+
+        <button id="save-btn" class="btn btn-p" style="margin-top:30px;" onclick="saveEntry()">Save Record</button>
+        <button class="btn" style="background:transparent; color:var(--dim); margin-top:5px;" onclick="closeEntry()">Cancel</button>
+    </div>
+</div>
+
+<div id="modal-detail" style="position:fixed; inset:0; background:rgba(0,0,0,0.95); display:none; align-items:center; justify-content:center; z-index:12000; padding:20px; backdrop-filter: blur(20px);">
+    <div class="card" style="width:100%; max-width:340px;">
+        <label style="display:block; text-align:center; color:var(--dim); font-size:0.7rem; letter-spacing:1px; margin-bottom:6px;">DATE</label>
+        <input type="date" id="det-date" class="input" style="text-align:center; margin-top:0; margin-bottom:18px;">
+        <label style="display:block; text-align:center; color:var(--dim); font-size:0.7rem; letter-spacing:1px; margin-bottom:6px;">AMOUNT (<span id="det-amt-currency"></span>)</label>
+        <input type="number" id="det-amt" class="input" style="font-size:2.2rem; text-align:center; background:transparent; border:none; margin-top:0; margin-bottom:20px; font-weight:800;" inputmode="decimal" step="0.01">
+        <input type="text" id="det-note" class="input" placeholder="Note">
+        <div style="display:grid; grid-template-columns: 1fr 1fr; gap:12px; margin-top:30px;">
+            <button class="btn btn-p" onclick="updateLog()">Update</button>
+            <button class="btn" style="background:var(--down); color:white;" onclick="fireLogDelete()">Delete</button>
+        </div>
+        <button class="btn" style="background:transparent; color:var(--dim); margin-top:10px;" onclick="closeDetail()">Close</button>
+    </div>
+</div>
+
+<script>
+    let currentUser = null, activeType = 'earn', logsChartPeriod = 'monthly', mainChart = null, logsChart = null, logsChartExpanded = null, selectedLogId = null, syncInterval = null;
+    let currencySymbol = localStorage.getItem('edgespay_currency') || 'GHC';
+    let balanceHidden = localStorage.getItem('edgespay_hide_balance') === 'true';
+
+    // --- CUSTOM MODAL SYSTEM DRIVERS ---
+    function callAlert(title, message) {
+        document.getElementById('u-alert-title').innerText = title;
+        document.getElementById('u-alert-msg').innerText = message;
+        document.getElementById('u-alert').style.display = 'flex';
+    }
+    function closeAlert() { document.getElementById('u-alert').style.display = 'none'; }
+
+    function callConfirm(title, message, runOnTrue) {
+        document.getElementById('u-confirm-title').innerText = title;
+        document.getElementById('u-confirm-msg').innerText = message;
+        const targetBtn = document.getElementById('u-confirm-yes');
+        targetBtn.onclick = function() { runOnTrue(); closeConfirm(); };
+        document.getElementById('u-confirm').style.display = 'flex';
+    }
+    function closeConfirm() { document.getElementById('u-confirm').style.display = 'none'; }
+
+    function callPrompt(title, message, runOnSubmit) {
+        document.getElementById('u-prompt-title').innerText = title;
+        document.getElementById('u-prompt-msg').innerText = message;
+        document.getElementById('u-prompt-input').value = '';
+        const actionBtn = document.getElementById('u-prompt-submit');
+        actionBtn.onclick = function() { runOnSubmit(document.getElementById('u-prompt-input').value); closePrompt(); };
+        document.getElementById('u-prompt').style.display = 'flex';
+        document.getElementById('u-prompt-input').focus();
+    }
+    function closePrompt() { document.getElementById('u-prompt').style.display = 'none'; }
+
+    // --- STARTUP CONFIG ---
+    window.onload = function() {
+        document.getElementById('bal-display').innerText = `${currencySymbol}0.00`;
+        const balEyeIcon = document.getElementById('bal-eye-icon');
+        if(balEyeIcon) balEyeIcon.className = balanceHidden ? 'ph-bold ph-eye-slash' : 'ph-bold ph-eye';
+        if(localStorage.getItem('edgespay_reduced_motion') === 'true') document.body.classList.add('reduced-motion');
+        applyLayoutMode(wideLayoutQuery.matches, false);
+
+        const savedColor = localStorage.getItem('app_theme_color');
+        const savedName = localStorage.getItem('app_theme_name');
+        if(savedColor) {
+            document.documentElement.style.setProperty('--bg', savedColor);
+            const nameEl = document.getElementById('active-theme-name');
+            if(nameEl && savedName) nameEl.innerText = savedName;
+            const matchingSwatch = document.querySelector(`.swatch[onclick*="${savedColor}"]`);
+            if(matchingSwatch) {
+                document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+                matchingSwatch.classList.add('active');
+            }
+        }
+
+        const saved = localStorage.getItem('edgespay_session');
+        const securityEnabled = localStorage.getItem('security_enabled') === 'true';
+        if(saved) {
+            currentUser = JSON.parse(saved);
+            if(securityEnabled) {
+                document.getElementById('lock-screen').style.display = 'flex';
+                document.getElementById('pin-entry').focus();
+                if(localStorage.getItem('faceid_enabled') === 'true') {
+                    const faceBtn = document.getElementById('faceid-unlock-btn');
+                    if(faceBtn) faceBtn.style.display = 'flex';
+                }
+            } else {
+                startApp();
+                armFullscreenOnFirstTap();
+            }
+            if(document.getElementById('security-toggle')) document.getElementById('security-toggle').checked = securityEnabled;
+        }
+        initFaceIDUI();
+        updateConnectionUI();
+    }
+
+    // --- RESPONSIVE SIDEBAR / ROTATION ANIMATIONS ---
+    // On tablets, landscape phones, or any larger viewport, the bottom tab bar
+    // becomes a left-hand sidebar. When that switch happens (typically because
+    // the device was rotated) we play a quick "flash" + staggered pop-in so the
+    // transition feels intentional rather than like a layout jump.
+    const wideLayoutQuery = window.matchMedia('(min-width: 760px)');
+
+    function playRotateFlash() {
+        if (document.body.classList.contains('reduced-motion')) return;
+        const flash = document.createElement('div');
+        flash.className = 'rotate-flash play';
+        document.body.appendChild(flash);
+        flash.addEventListener('animationend', () => flash.remove());
+    }
+
+    function replayEntranceAnimations() {
+        document.querySelectorAll('.n-btn').forEach((btn, i) => {
+            btn.style.animation = 'none';
+            void btn.offsetWidth;
+            btn.style.animation = `navPop 0.5s ${i * 0.06}s cubic-bezier(.34,1.56,.64,1) both`;
+        });
+        document.querySelectorAll('.view:not(.hidden) .card').forEach((card, i) => {
+            card.style.animation = 'none';
+            void card.offsetWidth;
+            card.style.animation = `cardSlide 0.45s ${i * 0.05}s cubic-bezier(.4,0,.2,1) both`;
+        });
+    }
+
+    function applyLayoutMode(isWide, animate) {
+        document.body.classList.toggle('wide-layout', isWide);
+        if (animate) {
+            playRotateFlash();
+            requestAnimationFrame(replayEntranceAnimations);
+        }
+    }
+
+    wideLayoutQuery.addEventListener('change', (e) => applyLayoutMode(e.matches, true));
+    window.addEventListener('orientationchange', () => {
+        setTimeout(() => applyLayoutMode(wideLayoutQuery.matches, true), 60);
+    });
+
+    // --- CONNECTIVITY / OFFLINE QUEUE ---
+    window.addEventListener('online', () => { updateConnectionUI(); flushOfflineQueue(); });
+    window.addEventListener('offline', () => updateConnectionUI());
+
+    function changeTheme(color, el, name) {
+        document.documentElement.style.setProperty('--bg', color);
+        localStorage.setItem('app_theme_color', color);
+        localStorage.setItem('app_theme_name', name || 'Custom');
+        document.querySelectorAll('.swatch').forEach(s => s.classList.remove('active'));
+        el.classList.add('active');
+        const nameEl = document.getElementById('active-theme-name');
+        if(nameEl) nameEl.innerText = name || 'Custom';
+    }
+
+    function isStandalone() {
+        return window.matchMedia('(display-mode: standalone)').matches || window.navigator.standalone === true;
+    }
+
+    // Safari's toolbar is OS chrome, not part of the page — it can only be removed by
+    // launching from a home screen icon (standalone mode), never by CSS/JS in a normal tab.
+    function maybeShowStandaloneHint() {
+        const isIOS = /iphone|ipad|ipod/i.test(navigator.userAgent);
+        if (!isIOS || isStandalone()) return;
+        if (localStorage.getItem('hide_standalone_hint') === '1') return;
+        const hint = document.getElementById('standalone-hint');
+        if (hint) hint.classList.remove('hidden');
+    }
+
+    function dismissStandaloneHint() {
+        document.getElementById('standalone-hint').classList.add('hidden');
+        localStorage.setItem('hide_standalone_hint', '1');
+    }
+
+    function goFullscreen() {
+        if (document.fullscreenElement || document.webkitFullscreenElement) return;
+        const doc = document.documentElement;
+        try {
+            const req = doc.requestFullscreen || doc.webkitRequestFullscreen || doc.mozRequestFullScreen || doc.msRequestFullscreen;
+            if (req) {
+                const result = req.call(doc);
+                if (result && result.catch) result.catch(() => {}); // some browsers reject without a prior gesture — fail silently
+            }
+        } catch (e) {}
+    }
+
+    // Browsers won't grant fullscreen without a user gesture, so returning users who skip
+    // straight past login/PIN (an existing, unlocked session) get it on their first tap instead.
+    function armFullscreenOnFirstTap() {
+        const trigger = () => { goFullscreen(); document.removeEventListener('click', trigger); document.removeEventListener('touchend', trigger); };
+        document.addEventListener('click', trigger, { once: true });
+        document.addEventListener('touchend', trigger, { once: true });
+    }
+
+    // --- FACE ID (iPhone only, via WebAuthn platform authenticator) ---
+    function isIPhoneDevice() {
+        return /iphone/i.test(navigator.userAgent);
+    }
+
+    async function isFaceIDAvailable() {
+        if (!isIPhoneDevice()) return false;
+        if (!window.PublicKeyCredential || !navigator.credentials) return false;
+        try { return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }
+        catch(e) { return false; }
+    }
+
+    async function initFaceIDUI() {
+        const row = document.getElementById('faceid-row');
+        if (!row) return;
+        const available = await isFaceIDAvailable();
+        row.style.display = available ? 'flex' : 'none';
+        if (available) {
+            const toggle = document.getElementById('faceid-toggle');
+            if (toggle) toggle.checked = localStorage.getItem('faceid_enabled') === 'true';
+        }
+    }
+
+    function randomBytes(len) {
+        const arr = new Uint8Array(len);
+        crypto.getRandomValues(arr);
+        return arr;
+    }
+
+    async function toggleFaceID(checked) {
+        if (checked) {
+            try {
+                const userIdBytes = new TextEncoder().encode(String(currentUser ? currentUser.id : 'edgespay-user'));
+                const cred = await navigator.credentials.create({
+                    publicKey: {
+                        challenge: randomBytes(32),
+                        rp: { name: "EdgesPay" },
+                        user: { id: userIdBytes, name: (currentUser && currentUser.username) || 'user', displayName: (currentUser && currentUser.username) || 'user' },
+                        pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
+                        authenticatorSelection: { authenticatorAttachment: "platform", userVerification: "required" },
+                        timeout: 60000
+                    }
+                });
+                if (cred) {
+                    localStorage.setItem('faceid_credential_id', btoa(String.fromCharCode(...new Uint8Array(cred.rawId))));
+                    localStorage.setItem('faceid_enabled', 'true');
+                    callAlert("Face ID Enabled", "You can now unlock EdgesPay using Face ID.");
+                }
+            } catch(e) {
+                const toggle = document.getElementById('faceid-toggle');
+                if (toggle) toggle.checked = false;
+                callAlert("Face ID Setup Failed", "Could not register Face ID on this device. Make sure Face ID is set up in your iPhone's settings.");
+            }
+        } else {
+            localStorage.removeItem('faceid_enabled');
+            localStorage.removeItem('faceid_credential_id');
+            callAlert("Face ID Disabled", "Face ID unlock has been turned off.");
+        }
+    }
+
+    async function unlockWithFaceID(silent) {
+        try {
+            const idB64 = localStorage.getItem('faceid_credential_id');
+            if (!idB64) return;
+            const rawId = Uint8Array.from(atob(idB64), c => c.charCodeAt(0));
+            const assertion = await navigator.credentials.get({
+                publicKey: {
+                    challenge: randomBytes(32),
+                    allowCredentials: [{ id: rawId, type: 'public-key' }],
+                    userVerification: "required",
+                    timeout: 60000
+                }
+            });
+            if (assertion) {
+                goFullscreen();
+                document.getElementById('lock-screen').style.display = 'none';
+                startApp();
+            }
+        } catch(e) {
+            // When triggered automatically on lock ("sign in by app"), fail quietly —
+            // the PIN field is already focused and ready as a fallback.
+            if (!silent) callAlert("Face ID Failed", "Face ID authentication wasn't completed. Please use your PIN instead.");
+        }
+    }
+
+    // --- PASSKEY SIGN-IN (login screen shortcut, any platform authenticator) ---
+    async function isPlatformAuthenticatorAvailable() {
+        if (!window.PublicKeyCredential || !navigator.credentials) return false;
+        try { return await PublicKeyCredential.isUserVerifyingPlatformAuthenticatorAvailable(); }
+        catch(e) { return false; }
+    }
+
+    function passkeyCredKey(username) { return `edgespay_passkey_credential_${(username || '').trim().toLowerCase()}`; }
+    function passkeyCacheKey(username) { return `edgespay_passkey_cache_${(username || '').trim().toLowerCase()}`; }
+
+    async function initPasskeyUI() {
+        const row = document.getElementById('passkey-row');
+        if (!row || !currentUser) return;
+        const available = await isPlatformAuthenticatorAvailable();
+        row.style.display = available ? 'flex' : 'none';
+        if (available) {
+            const toggle = document.getElementById('passkey-toggle');
+            if (toggle) toggle.checked = !!localStorage.getItem(passkeyCredKey(currentUser.username));
+        }
+    }
+
+    async function togglePasskey(checked) {
+        if (checked) {
+            try {
+                const userIdBytes = new TextEncoder().encode(String(currentUser.id));
+                const cred = await navigator.credentials.create({
+                    publicKey: {
+                        challenge: randomBytes(32),
+                        rp: { name: "EdgesPay" },
+                        user: { id: userIdBytes, name: currentUser.username, displayName: currentUser.username },
+                        pubKeyCredParams: [{ type: "public-key", alg: -7 }, { type: "public-key", alg: -257 }],
+                        authenticatorSelection: { userVerification: "required", residentKey: "preferred" },
+                        timeout: 60000
+                    }
+                });
+                if (cred) {
+                    localStorage.setItem(passkeyCredKey(currentUser.username), btoa(String.fromCharCode(...new Uint8Array(cred.rawId))));
+                    localStorage.setItem(passkeyCacheKey(currentUser.username), JSON.stringify({ id: currentUser.id, username: currentUser.username }));
+                    callAlert("Passkey Enabled", "You can now sign in on this device using a passkey instead of your password.");
+                }
+            } catch(e) {
+                const toggle = document.getElementById('passkey-toggle');
+                if (toggle) toggle.checked = false;
+                callAlert("Passkey Setup Failed", "Could not create a passkey on this device.");
+            }
+        } else {
+            localStorage.removeItem(passkeyCredKey(currentUser.username));
+            localStorage.removeItem(passkeyCacheKey(currentUser.username));
+            callAlert("Passkey Removed", "Passkey sign-in has been turned off for this account on this device.");
+        }
+    }
+
+    // Login screen: keep the password field hidden until the typed username is confirmed to exist
+    let usernameCheckTimer = null;
+    function handleLoginUsernameInput() {
+        clearTimeout(usernameCheckTimer);
+        const val = document.getElementById('log-user').value.trim();
+        const passSection = document.getElementById('login-password-section');
+        const passkeyBtn = document.getElementById('login-passkey-btn');
+        const hint = document.getElementById('login-username-hint');
+
+        passSection.classList.add('hidden');
+        passkeyBtn.classList.add('hidden');
+        if (hint) hint.innerText = '';
+        if (!val) return;
+
+        usernameCheckTimer = setTimeout(async () => {
+            try {
+                const res = await fetch(`api.php?action=check_username&username=${encodeURIComponent(val)}`);
+                const data = await res.json();
+                if (data.exists) {
+                    passSection.classList.remove('hidden');
+                    if (localStorage.getItem(passkeyCredKey(val))) passkeyBtn.classList.remove('hidden');
+                } else if (hint) {
+                    hint.innerText = "No account found with that username.";
+                }
+            } catch(e) {
+                // Can't verify right now (offline, etc) — fail open so the person can still try to sign in
+                passSection.classList.remove('hidden');
+            }
+        }, 450);
+    }
+
+    async function signInWithPasskey() {
+        const val = document.getElementById('log-user').value.trim();
+        if (!val) return;
+        const idB64 = localStorage.getItem(passkeyCredKey(val));
+        const cached = localStorage.getItem(passkeyCacheKey(val));
+        if (!idB64 || !cached) return callAlert("Passkey Not Set Up", "No passkey found for this username on this device.");
+
+        try {
+            const rawId = Uint8Array.from(atob(idB64), c => c.charCodeAt(0));
+            const assertion = await navigator.credentials.get({
+                publicKey: {
+                    challenge: randomBytes(32),
+                    allowCredentials: [{ id: rawId, type: 'public-key' }],
+                    userVerification: "required",
+                    timeout: 60000
+                }
+            });
+            if (assertion) {
+                currentUser = JSON.parse(cached);
+                localStorage.setItem('edgespay_session', JSON.stringify(currentUser));
+                goFullscreen();
+                startApp();
+            }
+        } catch(e) {
+            callAlert("Passkey Sign-In Failed", "Passkey authentication wasn't completed. Please sign in with your password instead.");
+        }
+    }
+
+    // --- PROFILE PHOTO ---
+    function avatarKey() {
+        return `edgespay_avatar_${currentUser ? currentUser.id : 'guest'}`;
+    }
+
+    function renderAvatar() {
+        const el = document.getElementById('profile-avatar');
+        if (!el) return;
+        const saved = localStorage.getItem(avatarKey());
+        if (saved) {
+            el.innerHTML = `<img src="${saved}" alt="Profile photo" style="width:100%; height:100%; object-fit:cover; border-radius:50%;">`;
+        } else {
+            el.innerHTML = '';
+            el.innerText = ((currentUser && currentUser.username) || 'U').charAt(0).toUpperCase();
+        }
+    }
+
+    function handleAvatarUpload(event) {
+        const file = event.target.files && event.target.files[0];
+        if (!file) return;
+        if (!file.type.startsWith('image/')) { callAlert("Invalid File", "Please choose an image file."); return; }
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const img = new Image();
+            img.onload = function() {
+                const size = 200;
+                const canvas = document.createElement('canvas');
+                canvas.width = size; canvas.height = size;
+                const ctx = canvas.getContext('2d');
+                const scale = Math.max(size / img.width, size / img.height);
+                const w = img.width * scale, h = img.height * scale;
+                ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
+                const dataUrl = canvas.toDataURL('image/jpeg', 0.85);
+                try {
+                    localStorage.setItem(avatarKey(), dataUrl);
+                    renderAvatar();
+                    callAlert("Profile Photo Updated", "Your new profile photo has been saved on this device.");
+                } catch(err) {
+                    callAlert("Storage Error", "Couldn't save that photo — it may be too large for this device's storage.");
+                }
+            };
+            img.src = e.target.result;
+        };
+        reader.readAsDataURL(file);
+    }
+
+    // --- HEADER MENU (replaces the old bare logout icon) ---
+    function toggleHeaderMenu(e) {
+        if (e) e.stopPropagation();
+        const menu = document.getElementById('header-menu');
+        if (!menu) return;
+        const isOpening = !menu.classList.contains('active');
+        menu.classList.toggle('active');
+        if (isOpening) document.addEventListener('click', outsideHeaderMenuHandler);
+        else document.removeEventListener('click', outsideHeaderMenuHandler);
+    }
+    function outsideHeaderMenuHandler(e) {
+        const menu = document.getElementById('header-menu');
+        if (menu && !menu.contains(e.target)) closeHeaderMenu();
+    }
+    function closeHeaderMenu() {
+        const menu = document.getElementById('header-menu');
+        if (menu) menu.classList.remove('active');
+        document.removeEventListener('click', outsideHeaderMenuHandler);
+    }
+
+    // --- OFFLINE QUEUE ---
+    function queueOfflineAction(item) {
+        const queue = JSON.parse(localStorage.getItem('edgespay_offline_queue') || '[]');
+        queue.push(item);
+        localStorage.setItem('edgespay_offline_queue', JSON.stringify(queue));
+        updateConnectionUI();
+    }
+
+    function removePendingAddFromQueue(log) {
+        let queue = JSON.parse(localStorage.getItem('edgespay_offline_queue') || '[]');
+        const idx = queue.findIndex(q => q.action === 'add' && q.payload.note === log.note && String(q.payload.amount) === String(log.amount) && q.payload.type === log.type);
+        if (idx !== -1) { queue.splice(idx, 1); localStorage.setItem('edgespay_offline_queue', JSON.stringify(queue)); }
+        updateConnectionUI();
+    }
+
+    async function flushOfflineQueue() {
+        if (!navigator.onLine || !currentUser) return;
+        let queue = JSON.parse(localStorage.getItem('edgespay_offline_queue') || '[]');
+        if (!queue.length) return;
+        updateConnectionUI('syncing');
+        while (queue.length) {
+            const item = queue[0];
+            try {
+                await fetch(`api.php?action=${item.action}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(item.payload)
+                });
+                queue.shift();
+                localStorage.setItem('edgespay_offline_queue', JSON.stringify(queue));
+            } catch(e) {
+                break; // connection dropped again mid-flush — remaining items stay queued for next attempt
+            }
+        }
+        if (!queue.length) localStorage.removeItem('edgespay_offline_queue');
+        await sync();
+        updateConnectionUI();
+    }
+
+    function updateConnectionUI(state) {
+        const pulse = document.getElementById('conn-pulse');
+        const label = document.getElementById('conn-label');
+        const banner = document.getElementById('offline-banner');
+        if (!pulse || !label) return;
+        const queueLen = JSON.parse(localStorage.getItem('edgespay_offline_queue') || '[]').length;
+
+        if (state === 'syncing') {
+            label.innerText = 'SYNCING';
+            pulse.style.background = 'var(--primary)'; pulse.style.boxShadow = '0 0 8px var(--primary)';
+            if (banner) banner.classList.add('hidden');
+            return;
+        }
+        if (!navigator.onLine) {
+            label.innerText = queueLen ? `OFFLINE (${queueLen} pending)` : 'OFFLINE';
+            pulse.style.background = 'var(--down)'; pulse.style.boxShadow = '0 0 8px var(--down)';
+            if (banner) banner.classList.remove('hidden');
+        } else {
+            label.innerText = queueLen ? `SYNCING (${queueLen} pending)` : 'LIVE';
+            pulse.style.background = queueLen ? 'var(--primary)' : 'var(--up)';
+            pulse.style.boxShadow = queueLen ? '0 0 8px var(--primary)' : '0 0 8px var(--up)';
+            if (banner) banner.classList.add('hidden');
+        }
+    }
+
+    // --- AUTH ACTIONS ---
+    async function handleAuth(type) {
+        const u = document.getElementById(type === 'login' ? 'log-user' : 'sign-user').value;
+        const p = document.getElementById(type === 'login' ? 'log-pass' : 'sign-pass').value;
+        if(!u || !p) return callAlert("Error", "All credential fields are required.");
+
+        try {
+            const res = await fetch(`api.php?action=${type}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ username: u, password: p })
+            });
+            const data = await res.json();
+            if(data.success) {
+                if(type === 'login') {
+                    currentUser = data.user;
+                    localStorage.setItem('edgespay_session', JSON.stringify(currentUser));
+                    goFullscreen();
+                    startApp();
+                } else { 
+                    localStorage.setItem('pending_onboarding', 'true');
+                    callAlert("Success", "Vault created successfully! You can sign in now."); 
+                    toggleAuth(); 
+                }
+            } else { callAlert("Authentication Refused", data.error); }
+        } catch(err) { callAlert("Server Offline", "Could not establish database connection pipeline."); }
+    }
+
+    function verifyPin() {
+        if(document.getElementById('pin-entry').value === localStorage.getItem('edgespay_pin')) {
+            goFullscreen();
+            document.getElementById('lock-screen').style.display = 'none';
+            startApp();
+        } else { 
+            callAlert("Access Denied", "Incorrect Security PIN entered."); 
+            document.getElementById('pin-entry').value = ''; 
+        }
+    }
+
+    function fireSecuritySetup(checked) {
+        if(checked) {
+            callPrompt("Pin Configuration", "Create a secure 4-digit master access sequence:", function(pinVal) {
+                if(pinVal && pinVal.length === 4 && !isNaN(pinVal)) {
+                    localStorage.setItem('edgespay_pin', pinVal);
+                    localStorage.setItem('security_enabled', 'true');
+                    callAlert("Security Setup", "Master Access Lock sequence set successfully.");
+                    updateChangePinVisibility();
+                } else {
+                    document.getElementById('security-toggle').checked = false;
+                    localStorage.setItem('security_enabled', 'false');
+                    callAlert("Invalid PIN", "PIN must be exactly 4 numeric characters.");
+                    updateChangePinVisibility();
+                }
+            });
+        } else {
+            localStorage.setItem('security_enabled', 'false');
+            callAlert("Security Update", "PIN Authentication disabled.");
+            updateChangePinVisibility();
+        }
+    }
+
+    function updateChangePinVisibility() {
+        const btn = document.getElementById('change-pin-btn');
+        if(btn) btn.style.display = localStorage.getItem('security_enabled') === 'true' ? 'block' : 'none';
+    }
+
+    function changePin() {
+        callPrompt("Change PIN", "Enter a new 4-digit master access sequence:", function(pinVal) {
+            if(pinVal && pinVal.length === 4 && !isNaN(pinVal)) {
+                localStorage.setItem('edgespay_pin', pinVal);
+                callAlert("PIN Updated", "Your security PIN has been changed successfully.");
+            } else {
+                callAlert("Invalid PIN", "PIN must be exactly 4 numeric characters.");
+            }
+        });
+    }
+
+    function exportTransactionsCSV() {
+        if(!currentUser || !currentUser.logs || currentUser.logs.length === 0) {
+            return callAlert("No Data", "There are no transactions to export yet.");
+        }
+        const sorted = [...currentUser.logs].sort((a, b) => new Date(a.date_stamp) - new Date(b.date_stamp));
+
+        let totalIncome = 0, totalExpense = 0, runningBalance = 0;
+        const rows = [];
+        sorted.forEach(l => {
+            const amt = parseFloat(l.amount);
+            if (l.type === 'earn') { totalIncome += amt; runningBalance += amt; }
+            else { totalExpense += amt; runningBalance -= amt; }
+            const note = (l.note || '').replace(/"/g, '""');
+            rows.push([
+                l.date_stamp.split(' ')[0],
+                l.type === 'earn' ? 'Earn' : 'Withdraw',
+                `"${note}"`,
+                `${l.type === 'earn' ? '' : '-'}${amt.toFixed(2)}`,
+                runningBalance.toFixed(2)
+            ]);
+        });
+
+        const esc = v => `"${String(v).replace(/"/g, '""')}"`;
+        const lines = [];
+        lines.push(esc('EdgesPay — Transaction Export'));
+        lines.push(`${esc('Account')},${esc(currentUser.username || '')}`);
+        lines.push(`${esc('Exported On')},${esc(new Date().toLocaleString())}`);
+        lines.push(`${esc('Currency')},${esc(currencySymbol)}`);
+        lines.push('');
+        lines.push(`${esc('Total Earned')},${totalIncome.toFixed(2)}`);
+        lines.push(`${esc('Total Withdraw')},${totalExpense.toFixed(2)}`);
+        lines.push(`${esc('Net Balance')},${runningBalance.toFixed(2)}`);
+        lines.push('');
+        lines.push(['Date', 'Type', 'Note', `Amount (${currencySymbol})`, `Running Balance (${currencySymbol})`].map(esc).join(','));
+        rows.forEach(r => lines.push(r.join(',')));
+
+        const csv = lines.join('\n');
+        const blob = new Blob(['\ufeff' + csv], { type: 'text/csv;charset=utf-8;' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `edgespay-export-${new Date().toISOString().split('T')[0]}.csv`;
+        document.body.appendChild(a);
+        a.click();
+        document.body.removeChild(a);
+        URL.revokeObjectURL(url);
+    }
+
+    function populateSettingsForm() {
+        if(!currentUser) return;
+        const usernameInput = document.getElementById('edit-username');
+        const usernameDisplay = document.getElementById('current-username-display');
+        if(usernameInput) usernameInput.value = currentUser.username || '';
+        if(usernameDisplay) usernameDisplay.innerText = currentUser.username || 'User';
+        renderAvatar();
+        updateChangePinVisibility();
+        initFaceIDUI();
+        initPasskeyUI();
+
+        const currencySelect = document.getElementById('currency-select');
+        if(currencySelect) currencySelect.value = currencySymbol;
+        const defaultTabSelect = document.getElementById('default-tab-select');
+        if(defaultTabSelect) defaultTabSelect.value = localStorage.getItem('edgespay_default_tab') || 'home';
+        const hideBalanceToggle = document.getElementById('hide-balance-toggle');
+        if(hideBalanceToggle) hideBalanceToggle.checked = balanceHidden;
+        const reduceMotionToggle = document.getElementById('reduce-motion-toggle');
+        if(reduceMotionToggle) reduceMotionToggle.checked = document.body.classList.contains('reduced-motion');
+    }
+
+    function changeCurrency(sym) {
+        currencySymbol = sym;
+        localStorage.setItem('edgespay_currency', sym);
+        renderBalanceDisplay();
+        fitBalanceText();
+        renderLists();
+        updateLogsChart();
+    }
+
+    function changeDefaultTab(tab) {
+        localStorage.setItem('edgespay_default_tab', tab);
+    }
+
+    function toggleReducedMotion(checked) {
+        document.body.classList.toggle('reduced-motion', checked);
+        localStorage.setItem('edgespay_reduced_motion', checked);
+    }
+
+    async function updateProfile() {
+        const name = document.getElementById('edit-username').value;
+        const pass = document.getElementById('edit-password').value;
+        if(!name) return callAlert("Input Needed", "Username cannot be blank.");
+
+        try {
+            const res = await fetch(`api.php?action=update_profile`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ user_id: currentUser.id, username: name, password: pass })
+            });
+            if((await res.json()).success) { 
+                callAlert("Profile Updated", "Security structural change complete. Re-authenticating vault.");
+                setTimeout(logout, 1500);
+            }
+        } catch(e) { callAlert("Network Error", "Failed to update profile configurations."); }
+    }
+
+    function deleteAccount() {
+        callConfirm("DANGER ZONE", "Wipe all account records? This process deletes your logs and credentials immediately from our systems permanently.", async function() {
+            try {
+                const res = await fetch(`api.php?action=delete_account`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user_id: currentUser.id })
+                });
+                
+                const data = await res.json();
+                if (data.success) {
+                    localStorage.removeItem(passkeyCredKey(currentUser.username));
+                    localStorage.removeItem(passkeyCacheKey(currentUser.username));
+                    localStorage.removeItem(avatarKey());
+                    localStorage.removeItem(chatStorageKey());
+                    callAlert("System Cleaned", "Vault content wiped successfully.");
+                    setTimeout(logout, 1500); 
+                } else { callAlert("Operation Failure", data.error); }
+            } catch (e) { callAlert("Network Error", "Vault cleanup failed due to server latency."); }
+        });
+    }
+
+    // --- ENGINE PIPELINE ---
+ function startApp() {
+    document.getElementById('auth-screen').style.display='none';
+    document.getElementById('app-content').style.display='flex';
+    if(localStorage.getItem('edgespay_reduced_motion') === 'true') document.body.classList.add('reduced-motion');
+    maybeShowStandaloneHint();
+    updateConnectionUI();
+    // Delay ensures the browser renders the container before drawing the chart
+    setTimeout(() => {
+        initChart();
+        initLogsChart();
+        sync();
+        const defaultTab = localStorage.getItem('edgespay_default_tab') || 'home';
+        if(defaultTab !== 'home') {
+            const btn = document.getElementById(`nav-btn-${defaultTab}`);
+            if(btn) navTo(defaultTab, btn);
+        }
+        if(localStorage.getItem('pending_onboarding') === 'true') {
+            startOnboarding();
+        }
+    }, 200);
+    syncInterval = setInterval(sync, 4000);
+}
+
+
+    async function sync(silent = false) {
+        if(!currentUser) return;
+        if (!navigator.onLine) { updateConnectionUI(); return; }
+
+        const queued = JSON.parse(localStorage.getItem('edgespay_offline_queue') || '[]');
+        if (queued.length) { await flushOfflineQueue(); return; } // flushOfflineQueue() calls sync() again once the queue is clear
+
+        try {
+            const res = await fetch(`api.php?action=sync&user_id=${currentUser.id}`);
+            const data = await res.json();
+            if(data.success) {
+                // Fingerprint the incoming logs (not just balance/count) so a date or note
+                // edit — which can leave balance and log count unchanged — still refreshes
+                // the UI and, crucially, re-sorts the line graph's data points correctly.
+                const newFingerprint = JSON.stringify((data.logs || []).map(l => [l.id, l.amount, l.type, l.date_stamp, l.note]));
+                const oldFingerprint = JSON.stringify((currentUser.logs || []).map(l => [l.id, l.amount, l.type, l.date_stamp, l.note]));
+
+                if(!currentUser.balance || parseFloat(data.balance).toFixed(2) !== parseFloat(currentUser.balance).toFixed(2) || newFingerprint !== oldFingerprint) {
+                    currentUser.balance = data.balance;
+                    currentUser.logs = data.logs;
+                    renderBalanceDisplay();
+                    fitBalanceText();
+                    renderLists();
+                    updateChart();
+                    updateLogsChart();
+                }
+            }
+            updateConnectionUI();
+        } catch(e) { updateConnectionUI(); }
+    }
+
+    function renderBalanceDisplay() {
+        const el = document.getElementById('bal-display');
+        if(!el || !currentUser) return;
+        el.innerText = balanceHidden ? '••••••' : `${currencySymbol}${parseFloat(currentUser.balance || 0).toLocaleString(undefined, {minimumFractionDigits: 2})}`;
+    }
+
+    function toggleBalanceVisibility() {
+        balanceHidden = !balanceHidden;
+        localStorage.setItem('edgespay_hide_balance', balanceHidden);
+        const icon = document.getElementById('bal-eye-icon');
+        if(icon) icon.className = balanceHidden ? 'ph-bold ph-eye-slash' : 'ph-bold ph-eye';
+        renderBalanceDisplay();
+        fitBalanceText();
+    }
+
+    async function saveEntry() {
+        const amt = document.getElementById('entry-amt').value;
+        const dateVal = document.getElementById('entry-date').value || new Date().toISOString().split('T')[0];
+        const note = document.getElementById('entry-note').value || 'Log';
+
+        if(!amt || isNaN(amt) || parseFloat(amt) <= 0) return callAlert("Validation Error", "Please provide a valid entry amount.");
+
+        const payload = { user_id: currentUser.id, type: activeType, amount: amt, note: note, date: dateVal };
+
+        if (!navigator.onLine) {
+            applyOptimisticAdd(payload);
+            queueOfflineAction({ action: 'add', payload });
+            closeEntry();
+            callAlert("Saved Offline", "You're offline. This transaction will sync automatically once you're back online.");
+            return;
+        }
+
+        try {
+            await fetch(`api.php?action=add`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload) // Sending the specific selected date to the backend
+            });
+            closeEntry(); 
+            sync();
+        } catch(e) {
+            applyOptimisticAdd(payload);
+            queueOfflineAction({ action: 'add', payload });
+            closeEntry();
+            callAlert("Saved Offline", "Network issue detected. Your transaction is queued and will sync automatically.");
+        }
+    }
+
+    function applyOptimisticAdd(payload) {
+        if (!currentUser) return;
+        if (!currentUser.logs) currentUser.logs = [];
+        const tempId = Date.now();
+        currentUser.logs.unshift({
+            id: tempId,
+            pending: true,
+            type: payload.type,
+            amount: payload.amount,
+            note: payload.note,
+            date_stamp: payload.date.length === 10 ? payload.date + ' 00:00:00' : payload.date
+        });
+        const amt = parseFloat(payload.amount);
+        currentUser.balance = parseFloat(currentUser.balance || 0) + (payload.type === 'earn' ? amt : -amt);
+        renderBalanceDisplay(); fitBalanceText(); renderLists(); updateChart(); updateLogsChart();
+    }
+
+    function fireLogDelete() {
+        const targetLog = currentUser && currentUser.logs ? currentUser.logs.find(l => String(l.id) === String(selectedLogId)) : null;
+        callConfirm("Remove Transaction", "Do you wish to delete this specific database record summary?", async function() {
+            // Item never made it to the server yet — just drop it locally and remove its queued 'add'
+            if (targetLog && targetLog.pending) {
+                removePendingAddFromQueue(targetLog);
+                applyOptimisticDelete(selectedLogId);
+                closeDetail();
+                return;
+            }
+
+            const payload = { id: selectedLogId, user_id: currentUser.id };
+
+            if (!navigator.onLine) {
+                applyOptimisticDelete(selectedLogId);
+                queueOfflineAction({ action: 'delete', payload });
+                closeDetail();
+                callAlert("Saved Offline", "You're offline. This deletion will sync automatically once you're back online.");
+                return;
+            }
+
+            try {
+                await fetch(`api.php?action=delete`, { 
+                    method: 'POST', 
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload) 
+                });
+                closeDetail(); 
+                sync();
+            } catch(e) {
+                applyOptimisticDelete(selectedLogId);
+                queueOfflineAction({ action: 'delete', payload });
+                closeDetail();
+                callAlert("Saved Offline", "Network issue detected. Deletion is queued and will sync automatically.");
+            }
+        });
+    }
+
+    function applyOptimisticDelete(id) {
+        if (!currentUser || !currentUser.logs) return;
+        const idx = currentUser.logs.findIndex(l => String(l.id) === String(id));
+        if (idx === -1) return;
+        const log = currentUser.logs[idx];
+        const amt = parseFloat(log.amount);
+        currentUser.balance = parseFloat(currentUser.balance || 0) + (log.type === 'earn' ? -amt : amt);
+        currentUser.logs.splice(idx, 1);
+        renderBalanceDisplay(); fitBalanceText(); renderLists(); updateChart(); updateLogsChart();
+    }
+
+    async function updateLog() {
+        const amt = document.getElementById('det-amt').value;
+        const dateVal = document.getElementById('det-date').value;
+        const note = document.getElementById('det-note').value;
+
+        if(!amt || isNaN(amt) || parseFloat(amt) <= 0) return callAlert("Validation Error", "Please provide a valid amount.");
+        if(!dateVal) return callAlert("Validation Error", "Please choose a valid date.");
+
+        const payload = { id: selectedLogId, user_id: currentUser.id, note: note, amount: amt, date: dateVal };
+
+        if (!navigator.onLine) {
+            applyOptimisticEdit(payload);
+            queueOfflineAction({ action: 'edit', payload });
+            closeDetail();
+            callAlert("Saved Offline", "You're offline. This change will sync automatically once you're back online.");
+            return;
+        }
+
+        try {
+            await fetch(`api.php?action=edit`, { 
+                method: 'POST', 
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload) 
+            });
+            closeDetail(); 
+            sync();
+        } catch(e) {
+            applyOptimisticEdit(payload);
+            queueOfflineAction({ action: 'edit', payload });
+            closeDetail();
+            callAlert("Saved Offline", "Network issue detected. Your change is queued and will sync automatically.");
+        }
+    }
+
+    function applyOptimisticEdit(payload) {
+        if (!currentUser || !currentUser.logs) return;
+        const log = currentUser.logs.find(l => String(l.id) === String(payload.id));
+        if (!log) return;
+        const oldAmt = parseFloat(log.amount);
+        const newAmt = parseFloat(payload.amount);
+        const diff = newAmt - oldAmt;
+        if (diff && currentUser.balance !== undefined) {
+            currentUser.balance = parseFloat(currentUser.balance || 0) + (log.type === 'earn' ? diff : -diff);
+        }
+        log.amount = payload.amount;
+        log.note = payload.note;
+        log.date_stamp = payload.date.length === 10 ? payload.date + ' 00:00:00' : payload.date;
+        renderBalanceDisplay(); fitBalanceText(); renderLists(); updateChart(); updateLogsChart();
+    }
+
+    // --- SORTING AND RENDERING ---
+    function logItemHtml(l) {
+        // Convert 'YYYY-MM-DD' cleanly for the display card
+        const displayDate = l.date_stamp.split(' ')[0]; 
+        const safeNote = (l.note || '').replace(/\\/g, '\\\\').replace(/'/g, "\\'");
+        const pendingBadge = l.pending ? `<span class="sync-badge">Pending</span>` : '';
+        return `<div class="card" onclick="openDetail(${l.id}, '${l.amount}', '${safeNote}', '${displayDate}')" style="display:flex; justify-content:space-between; padding:18px; margin-bottom:12px; cursor:pointer;">
+            <div><b>${l.note}</b>${pendingBadge}<br><small style="color:var(--dim); font-size:0.7rem;">${displayDate}</small></div>
+            <div style="color:${l.type === 'earn' ? 'var(--up)' : 'var(--down)'}; font-weight:800; white-space:nowrap;">${l.type === 'earn' ? '+' : '-'}${currencySymbol}${parseFloat(l.amount).toFixed(2)}</div>
+        </div>`;
+    }
+
+    function getSortedLogs() {
+        if(!currentUser || !currentUser.logs) return [];
+        // Sort by id (creation order) rather than date_stamp, since date_stamp is a
+        // user-editable transaction date and can be backdated/postdated.
+        return [...currentUser.logs].sort((a, b) => b.id - a.id);
+    }
+
+    function renderLists() {
+        if(!currentUser.logs) return;
+        const sortedLogs = getSortedLogs();
+        document.getElementById('home-recent').innerHTML = sortedLogs.slice(0, 3).map(logItemHtml).join('');
+        filterLogs();
+    }
+
+    function filterLogs() {
+        if(!currentUser || !currentUser.logs) return;
+        const searchEl = document.getElementById('log-search');
+        const term = searchEl ? searchEl.value.trim().toLowerCase() : '';
+        const sortedLogs = getSortedLogs();
+        const filtered = term
+            ? sortedLogs.filter(l => 
+                (l.note || '').toLowerCase().includes(term) ||
+                l.date_stamp.split(' ')[0].includes(term) ||
+                parseFloat(l.amount).toFixed(2).includes(term)
+              )
+            : sortedLogs;
+
+        const target = document.getElementById('full-history');
+        if(filtered.length === 0) {
+            target.innerHTML = `<p style="text-align:center; color:var(--dim); margin-top:30px;">No matching transactions found.</p>`;
+        } else {
+            target.innerHTML = filtered.map(logItemHtml).join('');
+        }
+    }
+
+    // --- OMNI SEARCH: drop -> bar -> pills -> detail, fully reversible ---
+    let omniCloseTimer = null;
+
+    function openOmniSearch() {
+        clearTimeout(omniCloseTimer);
+        const overlay = document.getElementById('search-overlay');
+        const nav = document.querySelector('nav');
+
+        document.getElementById('search-results-pills').innerHTML = '';
+        document.getElementById('omni-search-input').value = '';
+        nav.classList.add('nav-hidden');     // menu slides away on every device
+        overlay.classList.add('active');     // drop falls + morphs into the bar, background blurs
+
+        setTimeout(() => document.getElementById('omni-search-input').focus(), 380);
+    }
+
+    function closeOmniSearch() {
+        const overlay = document.getElementById('search-overlay');
+        const nav = document.querySelector('nav');
+        const pillsWrap = document.getElementById('search-results-pills');
+
+        closeSearchDetail();
+        document.getElementById('omni-search-input').blur();
+
+        // results sink back down first
+        const pills = Array.from(pillsWrap.children);
+        pills.forEach((pill, i) => {
+            pill.style.transition = `opacity 0.3s ease ${i * 0.03}s, transform 0.35s cubic-bezier(.4,0,.2,1) ${i * 0.03}s`;
+            pill.style.opacity = '0';
+            pill.style.transform = 'translateY(28px) scale(0.9)';
+        });
+
+        // then the bar liquifies back up into the drop, and the menu returns
+        omniCloseTimer = setTimeout(() => {
+            overlay.classList.remove('active');
+            nav.classList.remove('nav-hidden');
+            pillsWrap.innerHTML = '';
+        }, pills.length ? 260 : 80);
+    }
+
+    function runOmniSearch() {
+        const wrap = document.getElementById('search-results-pills');
+        const term = document.getElementById('omni-search-input').value.trim().toLowerCase();
+
+        if (!term) { wrap.innerHTML = ''; return; }
+        if (!currentUser || !currentUser.logs) { wrap.innerHTML = ''; return; }
+
+        const matches = getSortedLogs().filter(l => {
+            const catWord = l.type === 'earn' ? 'earn' : 'withdraw';
+            return (l.note || '').toLowerCase().includes(term) ||
+                   l.date_stamp.split(' ')[0].includes(term) ||
+                   parseFloat(l.amount).toFixed(2).includes(term) ||
+                   catWord.includes(term);
+        }).slice(0, 30);
+
+        if (matches.length === 0) {
+            wrap.innerHTML = `<p style="text-align:center; color:var(--dim); margin-top:20px;">No matching earnings or withdrawals found.</p>`;
+            return;
+        }
+
+        wrap.innerHTML = matches.map((l, i) => {
+            const isGain = l.type === 'earn';
+            return `<div class="result-pill" style="animation-delay:${i * 0.04}s" onclick="openSearchDetail(${l.id})">
+                <div style="min-width:0;">
+                    <b style="display:block; overflow:hidden; text-overflow:ellipsis; white-space:nowrap;">${l.note || (isGain ? 'Earn' : 'Withdraw')}</b>
+                    <small style="color:var(--dim); font-size:0.7rem;">${l.date_stamp.split(' ')[0]} · ${isGain ? 'Earn' : 'Withdraw'}</small>
+                </div>
+                <div style="color:${isGain ? 'var(--up)' : 'var(--down)'}; font-weight:800; white-space:nowrap; flex-shrink:0;">${isGain ? '+' : '-'}${currencySymbol}${parseFloat(l.amount).toFixed(2)}</div>
+            </div>`;
+        }).join('');
+    }
+
+    function openSearchDetail(id) {
+        const log = currentUser.logs.find(l => l.id == id);
+        if (!log) return;
+        const isGain = log.type === 'earn';
+        const sameCategory = currentUser.logs.filter(l => l.type === log.type);
+        const maxInCategory = Math.max(...sameCategory.map(l => parseFloat(l.amount)));
+        const amt = parseFloat(log.amount);
+        const pct = maxInCategory > 0 ? Math.round((amt / maxInCategory) * 100) : 100;
+        const color = isGain ? 'var(--up)' : 'var(--down)';
+        const catLabel = isGain ? 'Earn' : 'Withdraw';
+
+        document.getElementById('search-detail-content').innerHTML = `
+            <div style="text-align:center;">
+                <p style="color:var(--dim); text-transform:uppercase; font-size:0.7rem; letter-spacing:1.5px; margin:0;">${catLabel}</p>
+                <h1 style="margin:8px 0; font-size:2.4rem; color:${color};">${isGain ? '+' : '-'}${currencySymbol}${amt.toFixed(2)}</h1>
+                <p style="color:var(--dim); margin:0;">${log.note || '—'}</p>
+            </div>
+            <div style="margin-top:26px;">
+                <div style="display:flex; justify-content:space-between; padding:12px 0; border-bottom:1px solid var(--border);"><span style="color:var(--dim);">Date</span><b>${log.date_stamp.split(' ')[0]}</b></div>
+                <div style="display:flex; justify-content:space-between; padding:12px 0;"><span style="color:var(--dim);">Category</span><b>${catLabel}</b></div>
+            </div>
+            <div style="margin-top:26px;">
+                <p style="color:var(--dim); font-size:0.72rem; margin-bottom:8px; letter-spacing:0.5px;">SIZE VS OTHER ${catLabel.toUpperCase()} ENTRIES</p>
+                <div style="background:var(--glass); border-radius:12px; height:10px; overflow:hidden;">
+                    <div style="height:100%; width:${pct}%; background:${color}; border-radius:12px; transition:width 0.6s cubic-bezier(.4,0,.2,1);"></div>
+                </div>
+                <p style="color:var(--dim); font-size:0.7rem; margin-top:8px;">${pct}% of your largest ${catLabel.toLowerCase()} entry (${currencySymbol}${maxInCategory.toFixed(2)})</p>
+            </div>
+        `;
+        document.getElementById('search-detail-panel').classList.add('active');
+    }
+
+    function closeSearchDetail() {
+        document.getElementById('search-detail-panel').classList.remove('active');
+    }
+
+    function initChart() {
+        if (mainChart) return; // avoid "Canvas is already in use" if this ever runs twice in one session
+        const ctx = document.getElementById('mainChart').getContext('2d');
+        mainChart = new Chart(ctx, {
+            type: 'line',
+            data: { labels: new Array(10).fill(''), datasets: [{ data: new Array(10).fill(0), borderColor: '#6366f1', tension: 0.4, pointRadius: 0, fill: true, backgroundColor: 'rgba(99, 102, 241, 0.05)' }] },
+            options: { responsive: true, maintainAspectRatio: false, plugins: { legend: false }, scales: { x: { display: false }, y: { display: false } } }
+        });
+    }
+
+    function updateChart() {
+        if(!mainChart || !currentUser.logs) return;
+
+        // Sort logs by date to ensure the line graph flows correctly
+        const sorted = [...currentUser.logs].sort((a, b) => new Date(a.date_stamp) - new Date(b.date_stamp));
+        let runningBalance = 0;
+
+        // Map the logs to calculate the balance at each point in time
+        const dataPoints = sorted.map(l => {
+            runningBalance += (l.type === 'earn' ? parseFloat(l.amount) : -parseFloat(l.amount));
+            return runningBalance;
+        });
+
+        // Chart.js needs at least two points to draw a visible line — with zero
+        // transactions that's a flat [0, 0], and with exactly one transaction we
+        // prepend a 0 starting-balance point so the line actually renders instead
+        // of collapsing to an invisible single dot.
+        let finalPoints;
+        if (dataPoints.length === 0) finalPoints = [0, 0];
+        else if (dataPoints.length === 1) finalPoints = [0, dataPoints[0]];
+        else finalPoints = dataPoints;
+
+        mainChart.data.labels = new Array(finalPoints.length).fill('');
+        mainChart.data.datasets[0].data = finalPoints;
+        mainChart.update();
+    }
+
+    // --- LOGS PAGE PIE CHART ---
+    function isInPeriod(dateStamp, period) {
+        const d = new Date(dateStamp.split(' ')[0]);
+        const now = new Date();
+
+        if(period === 'daily') {
+            return d.toDateString() === now.toDateString();
+        }
+        if(period === 'weekly') {
+            const weekNum = (dt) => {
+                const jan1 = new Date(dt.getFullYear(), 0, 1);
+                return Math.ceil((((dt - jan1) / 86400000) + jan1.getDay() + 1) / 7);
+            };
+            return d.getFullYear() === now.getFullYear() && weekNum(d) === weekNum(now);
+        }
+        if(period === 'monthly') {
+            return d.getFullYear() === now.getFullYear() && d.getMonth() === now.getMonth();
+        }
+        // yearly
+        return d.getFullYear() === now.getFullYear();
+    }
+
+    function getChartBreakdown(period) {
+        const allLogs = (currentUser && currentUser.logs) || [];
+        const logs = allLogs.filter(l => isInPeriod(l.date_stamp, period));
+        const earn = logs.filter(l => l.type === 'earn').reduce((s, l) => s + parseFloat(l.amount), 0);
+        const withdraw = logs.filter(l => l.type === 'withdraw').reduce((s, l) => s + parseFloat(l.amount), 0);
+        return { earn, withdraw, count: logs.length };
+    }
+
+    function setLogsChartPeriod(period, btn) {
+        logsChartPeriod = period;
+        document.querySelectorAll('.lp-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        updateLogsChart();
+    }
+
+    function initLogsChart() {
+        const canvas = document.getElementById('logsChart');
+        if(!canvas || logsChart) return;
+        const { earn, withdraw } = getChartBreakdown(logsChartPeriod);
+        logsChart = new Chart(canvas.getContext('2d'), {
+            type: 'doughnut',
+            data: {
+                labels: ['Earn', 'Withdraw'],
+                datasets: [{ data: [earn || 0.0001, withdraw || 0.0001], backgroundColor: ['#00ffbd', '#ff3e3e'], borderWidth: 0, hoverOffset: 6 }]
+            },
+            options: {
+                responsive: true, maintainAspectRatio: false, cutout: '70%',
+                plugins: { legend: { position: 'bottom', labels: { color: '#8e95a2', boxWidth: 10, padding: 14, font: { size: 11 } } } }
+            }
+        });
+    }
+
+    function updateLogsChart() {
+        const { earn, withdraw } = getChartBreakdown(logsChartPeriod);
+        if(logsChart) {
+            logsChart.data.datasets[0].data = [earn || 0.0001, withdraw || 0.0001];
+            logsChart.update();
+        }
+        if(logsChartExpanded) {
+            logsChartExpanded.data.datasets[0].data = [earn || 0.0001, withdraw || 0.0001];
+            logsChartExpanded.update();
+        }
+    }
+
+    function openChartDetail() {
+        const { earn, withdraw, count } = getChartBreakdown(logsChartPeriod);
+        const net = earn - withdraw;
+        const daily = getChartBreakdown('daily');
+        const monthly = getChartBreakdown('monthly');
+        const yearly = getChartBreakdown('yearly');
+        document.getElementById('modal-chart-detail').style.display = 'flex';
+
+        requestAnimationFrame(() => {
+            if(!logsChartExpanded) {
+                const ctx = document.getElementById('logsChartExpanded').getContext('2d');
+                logsChartExpanded = new Chart(ctx, {
+                    type: 'doughnut',
+                    data: { labels: ['Earn', 'Withdraw'], datasets: [{ data: [earn || 0.0001, withdraw || 0.0001], backgroundColor: ['#00ffbd', '#ff3e3e'], borderWidth: 0, hoverOffset: 8 }] },
+                    options: { responsive: true, maintainAspectRatio: false, cutout: '65%', plugins: { legend: { position: 'bottom', labels: { color: '#8e95a2', padding: 16 } } } }
+                });
+            } else {
+                logsChartExpanded.resize();
+                logsChartExpanded.data.datasets[0].data = [earn || 0.0001, withdraw || 0.0001];
+                logsChartExpanded.update();
+            }
+        });
+
+        const periodLabel = { daily: 'Today', weekly: 'This Week', monthly: 'This Month', yearly: 'This Year' }[logsChartPeriod];
+        document.getElementById('chart-detail-stats').innerHTML = `
+            <p style="text-align:center; color:var(--dim); font-size:0.7rem; letter-spacing:1px; margin: -8px 0 14px;">${periodLabel.toUpperCase()}</p>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);"><span style="color:var(--dim);">Total Earned</span><b style="color:var(--up);">${currencySymbol}${earn.toFixed(2)}</b></div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);"><span style="color:var(--dim);">Total Withdrawals</span><b style="color:var(--down);">${currencySymbol}${withdraw.toFixed(2)}</b></div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--border);"><span style="color:var(--dim);">Net Balance</span><b>${net >= 0 ? '+' : '-'}${currencySymbol}${Math.abs(net).toFixed(2)}</b></div>
+            <div style="display:flex; justify-content:space-between; padding:10px 0;"><span style="color:var(--dim);">Total Transactions</span><b>${count}</b></div>
+
+            <h4 style="margin:24px 0 12px; color:var(--dim); font-size:0.7rem; letter-spacing:1px; text-align:center;">AMOUNT EARNED</h4>
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);"><span style="color:var(--dim);">Today</span><b style="color:var(--up);">${currencySymbol}${daily.earn.toFixed(2)}</b></div>
+            <div style="display:flex; justify-content:space-between; padding:8px 0; border-bottom:1px solid var(--border);"><span style="color:var(--dim);">This Month</span><b style="color:var(--up);">${currencySymbol}${monthly.earn.toFixed(2)}</b></div>
+            <div style="display:flex; justify-content:space-between; padding:8px 0;"><span style="color:var(--dim);">This Year</span><b style="color:var(--up);">${currencySymbol}${yearly.earn.toFixed(2)}</b></div>
+        `;
+    }
+
+    function closeChartDetail() {
+        document.getElementById('modal-chart-detail').style.display = 'none';
+    }
+
+    // Long-press (tap & hold) handler, works for both touch and mouse
+    function attachLongPress(el, callback, duration = 500) {
+        if(!el) return;
+        let timer = null;
+        const start = () => { clearTimeout(timer); timer = setTimeout(callback, duration); };
+        const cancel = () => clearTimeout(timer);
+        el.addEventListener('mousedown', start);
+        el.addEventListener('touchstart', start, { passive: true });
+        el.addEventListener('mouseup', cancel);
+        el.addEventListener('mouseleave', cancel);
+        el.addEventListener('touchend', cancel);
+        el.addEventListener('touchmove', cancel);
+    }
+    attachLongPress(document.getElementById('logs-chart-card'), openChartDetail);
+
+    // --- INTERACTIVE SPOTLIGHT TOUR ---
+    const tourSteps = [
+        { icon: 'ph-hand-waving', title: 'Welcome to EdgesPay!', msg: "Let's take a real, interactive tour. I'll walk you through the app and show you exactly what each part does.", target: null },
+        { icon: 'ph-wallet', title: 'Your Balance', msg: 'Your total balance lives here, with a live trend line underneath tracking how it has moved over time. Tap the eye icon any time to hide it from view.', target: '#tour-balance-card', navigateTo: 'home' },
+        { icon: 'ph-trend-up', title: 'Log Earnings & Withdrawals', msg: 'Tap Earn or Withdraw whenever you want to record money coming in or going out.', target: '#income-expense-row', navigateTo: 'home' },
+        { icon: 'ph-clock', title: 'Heading to Logs', msg: "This opens your full transaction history. Tap Next and I'll take you there myself.", target: '#nav-btn-history', navigateTo: 'home' },
+        { icon: 'ph-chart-pie-slice', title: 'Earn vs Withdraw Breakdown', msg: "Tap & hold this chart any time for a full breakdown. Watch — I'll show you what that looks like.", target: '#logs-chart-card', navigateTo: 'history', demo: demoChartBreakdown },
+        { icon: 'ph-magnifying-glass', title: 'Search Anytime', msg: "This is your search button. Watch closely — I'm going to run a real search for you.", target: '#nav-search-btn', navigateTo: 'history', demo: demoSearch },
+        { icon: 'ph-user-gear', title: 'Heading to Settings', msg: "Let's check out Settings — tap Next and I'll switch you over.", target: '#nav-btn-settings', navigateTo: 'history' },
+        { icon: 'ph-sliders-horizontal', title: 'Make It Yours', msg: 'Set a currency, pick what tab opens first, hide your balance by default, or reduce motion — all live, right here.', target: '#tour-pref-card', navigateTo: 'settings' },
+        { icon: 'ph-check-circle', title: "You're all set!", msg: 'Start by logging your first transaction. Enjoy using EdgesPay.', target: null }
+    ];
+    let tourStep = 0;
+
+    function startOnboarding() {
+        tourStep = 0;
+        document.getElementById('tour-overlay').classList.add('active');
+        goToTourStep(0);
+    }
+
+    function goToTourStep(index) {
+        const step = tourSteps[index];
+        const spotlight = document.getElementById('tour-spotlight');
+        const tooltip = document.getElementById('tour-tooltip');
+        spotlight.classList.remove('demo-hidden');
+        tooltip.classList.remove('demo-hidden');
+
+        if (step.navigateTo) {
+            const btn = document.getElementById(`nav-btn-${step.navigateTo}`);
+            if (btn && !btn.classList.contains('active')) navTo(step.navigateTo, btn);
+        }
+
+        // Wait a tick for the view switch / layout to settle before measuring positions
+        setTimeout(() => {
+            positionTourSpotlight(step);
+            renderTourStep(step);
+            if (step.demo) setTimeout(() => step.demo(), 700);
+        }, step.navigateTo ? 260 : 50);
+    }
+
+    function positionTourSpotlight(step) {
+        const spotlight = document.getElementById('tour-spotlight');
+        if (!step.target) {
+            spotlight.classList.add('no-target');
+            spotlight.style.top = '50%';
+            spotlight.style.left = '50%';
+            spotlight.style.width = '0px';
+            spotlight.style.height = '0px';
+            positionTourTooltip(null);
+            return;
+        }
+        const el = document.querySelector(step.target);
+        if (!el) { spotlight.classList.add('no-target'); positionTourTooltip(null); return; }
+        el.scrollIntoView({ block: 'center', behavior: 'smooth' });
+        setTimeout(() => {
+            const r = el.getBoundingClientRect();
+            const pad = 10;
+            spotlight.classList.remove('no-target');
+            spotlight.style.top = (r.top - pad) + 'px';
+            spotlight.style.left = (r.left - pad) + 'px';
+            spotlight.style.width = (r.width + pad * 2) + 'px';
+            spotlight.style.height = (r.height + pad * 2) + 'px';
+            positionTourTooltip(r);
+        }, 320);
+    }
+
+    function positionTourTooltip(rect) {
+        const tooltip = document.getElementById('tour-tooltip');
+        // Measure after a frame so offsetHeight reflects current content
+        requestAnimationFrame(() => {
+            const h = tooltip.offsetHeight || 220;
+            const margin = 18;
+            let top;
+            if (!rect) {
+                top = (window.innerHeight - h) / 2;
+            } else {
+                const spaceBelow = window.innerHeight - rect.bottom;
+                const spaceAbove = rect.top;
+                if (spaceBelow >= h + margin) top = rect.bottom + margin;
+                else if (spaceAbove >= h + margin) top = rect.top - margin - h;
+                else top = Math.max(margin, (window.innerHeight - h) / 2);
+            }
+            top = Math.min(Math.max(margin, top), window.innerHeight - h - margin);
+            tooltip.style.top = top + 'px';
+        });
+    }
+
+    function renderTourStep(step) {
+        document.getElementById('tour-icon').innerHTML = `<i class="ph-bold ${step.icon}"></i>`;
+        document.getElementById('tour-title').innerText = step.title;
+        document.getElementById('tour-msg').innerText = step.msg;
+        document.getElementById('tour-dots').innerHTML = tourSteps.map((_, i) =>
+            `<div style="width:7px; height:7px; border-radius:50%; background:${i === tourStep ? 'var(--primary)' : 'var(--border)'};"></div>`
+        ).join('');
+        const isLast = tourStep === tourSteps.length - 1;
+        const isFirst = tourStep === 0;
+        document.getElementById('tour-next-btn').innerText = isLast ? 'Get Started' : isFirst ? 'Start Tour' : (step.demo ? 'Skip demo' : 'Next');
+        document.getElementById('tour-skip-btn').style.display = isLast ? 'none' : 'flex';
+    }
+
+    function nextTourStep() {
+        const current = tourSteps[tourStep];
+        if (current && current.demo) { closeOmniSearch(); closeChartDetail(); }
+        if (tourStep < tourSteps.length - 1) {
+            tourStep++;
+            goToTourStep(tourStep);
+        } else {
+            finishOnboarding();
+        }
+    }
+
+    function skipTour() { finishOnboarding(); }
+
+    function finishOnboarding() {
+        document.getElementById('tour-overlay').classList.remove('active');
+        document.getElementById('tour-demo-badge').classList.remove('active');
+        // Make sure no live demo was left mid-flight
+        closeOmniSearch();
+        closeChartDetail();
+        localStorage.removeItem('pending_onboarding');
+    }
+
+    // Live demo: briefly opens the real earn/withdraw breakdown so the person sees it, not just hears about it
+    function demoChartBreakdown() {
+        const spotlight = document.getElementById('tour-spotlight');
+        const tooltip = document.getElementById('tour-tooltip');
+        const badge = document.getElementById('tour-demo-badge');
+        spotlight.classList.add('demo-hidden');
+        tooltip.classList.add('demo-hidden');
+        badge.classList.add('active');
+        openChartDetail();
+        setTimeout(() => {
+            closeChartDetail();
+            badge.classList.remove('active');
+            spotlight.classList.remove('demo-hidden');
+            tooltip.classList.remove('demo-hidden');
+        }, 2200);
+    }
+
+    // Live demo: actually opens the search overlay and types a real query so the person sees results land
+    function demoSearch() {
+        const spotlight = document.getElementById('tour-spotlight');
+        const tooltip = document.getElementById('tour-tooltip');
+        const badge = document.getElementById('tour-demo-badge');
+        spotlight.classList.add('demo-hidden');
+        tooltip.classList.add('demo-hidden');
+        badge.classList.add('active');
+        openOmniSearch();
+        setTimeout(() => {
+            const sample = (currentUser && currentUser.logs && currentUser.logs.length)
+                ? (currentUser.logs[0].note || (currentUser.logs[0].type === 'earn' ? 'earn' : 'withdraw'))
+                : 'earn';
+            typeIntoSearch(sample, 0, () => {
+                setTimeout(() => {
+                    closeOmniSearch();
+                    badge.classList.remove('active');
+                    spotlight.classList.remove('demo-hidden');
+                    tooltip.classList.remove('demo-hidden');
+                }, 1300);
+            });
+        }, 550);
+    }
+
+    function typeIntoSearch(text, i, done) {
+        const input = document.getElementById('omni-search-input');
+        if (!input) { done(); return; }
+        if (i <= text.length) {
+            input.value = text.slice(0, i);
+            runOmniSearch();
+            setTimeout(() => typeIntoSearch(text, i + 1, done), 85);
+        } else {
+            done();
+        }
+    }
+
+    window.addEventListener('resize', () => {
+        if (document.getElementById('tour-overlay').classList.contains('active')) {
+            positionTourSpotlight(tourSteps[tourStep]);
+        }
+    });
+
+
+    function fitBalanceText() {
+        const el = document.getElementById('bal-display');
+        if(!el) return;
+        const len = el.innerText.length;
+        // Shrink further as the digit count grows, on top of the responsive clamp() base size
+        let scale = 1;
+        if(len > 9) scale = 0.85;
+        if(len > 12) scale = 0.7;
+        if(len > 15) scale = 0.55;
+        el.style.transform = `scale(${scale})`;
+    }
+
+    // ================= LOCAL FINANCE CHAT ASSISTANT (runs entirely on-device) =================
+    let chatHistory = [];
+
+    function chatStorageKey() {
+        return currentUser ? `edgespay_chat_${currentUser.id}` : 'edgespay_chat_guest';
+    }
+
+    function loadChatHistory() {
+        try { return JSON.parse(localStorage.getItem(chatStorageKey()) || '[]'); }
+        catch { return []; }
+    }
+
+    function saveChatHistory(msgs) {
+        localStorage.setItem(chatStorageKey(), JSON.stringify(msgs.slice(-200)));
+    }
+
+    function escapeHtml(s) {
+        return String(s).replace(/[&<>"']/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+    }
+
+    const CHAT_SUGGESTIONS = [
+        "What's my balance?",
+        "How much did I earn this month?",
+        "How much did I withdraw this month?",
+        "What's my biggest transaction?",
+        "Give me a savings tip"
+    ];
+
+    function renderChatSuggestions() {
+        const wrap = document.getElementById('chat-suggestions');
+        if (!wrap) return;
+        wrap.innerHTML = CHAT_SUGGESTIONS.map(s =>
+            `<div class="chat-chip" onclick="askSuggestion('${s.replace(/'/g, "\\'")}')">${s}</div>`
+        ).join('');
+    }
+
+    function askSuggestion(text) {
+        document.getElementById('chat-input').value = text;
+        sendChatMessage();
+    }
+
+    function renderChatMessages() {
+        const wrap = document.getElementById('chat-messages');
+        if (!wrap) return;
+        if (chatHistory.length === 0) {
+            wrap.innerHTML = `<div class="chat-empty"><i class="ph-bold ph-chat-circle-dots" style="font-size:1.8rem; display:block; margin-bottom:8px;"></i>Ask me things like &ldquo;what's my balance&rdquo; or &ldquo;how much did I earn this month&rdquo;.</div>`;
+        } else {
+            wrap.innerHTML = chatHistory.map(m =>
+                `<div class="chat-bubble ${m.role === 'user' ? 'user' : 'bot'}">${escapeHtml(m.text)}</div>`
+            ).join('');
+            wrap.scrollTop = wrap.scrollHeight;
+        }
+        renderChatSuggestions();
+    }
+
+    function clearChat() {
+        if (!confirm('Clear this chat history? This only affects this device.')) return;
+        chatHistory = [];
+        saveChatHistory(chatHistory);
+        renderChatMessages();
+    }
+
+    function addChatMessage(role, text) {
+        chatHistory.push({ role, text, ts: Date.now() });
+        saveChatHistory(chatHistory);
+        renderChatMessages();
+    }
+
+    function sendChatMessage() {
+        const input = document.getElementById('chat-input');
+        const text = input.value.trim();
+        if (!text) return;
+        input.value = '';
+        addChatMessage('user', text);
+        setTimeout(() => addChatMessage('bot', generateAssistantReply(text)), 280);
+    }
+
+    function generateAssistantReply(rawText) {
+        const t = rawText.toLowerCase();
+        const logs = (currentUser && currentUser.logs) || [];
+        const bal = parseFloat((currentUser && currentUser.balance) || 0);
+        const fmt = (n) => `${currencySymbol}${(n || 0).toFixed(2)}`;
+
+        if (/\b(hi|hello|hey)\b/.test(t) && t.length < 20) {
+            return "Hey! I can tell you about your balance, earnings, withdrawals, or biggest transactions. What do you want to know?";
+        }
+        if (/balance/.test(t)) {
+            return `Your current balance is ${fmt(bal)}.`;
+        }
+        if (/(this month|month)/.test(t) && /(earn|income|gain)/.test(t)) {
+            return `You've earned ${fmt(getChartBreakdown('monthly').earn)} so far this month.`;
+        }
+        if (/(this month|month)/.test(t) && /(withdraw|spend|spent|expense)/.test(t)) {
+            return `You've withdrawn ${fmt(getChartBreakdown('monthly').withdraw)} so far this month.`;
+        }
+        if (/today/.test(t) && /(earn|income)/.test(t)) {
+            return `You've earned ${fmt(getChartBreakdown('daily').earn)} today.`;
+        }
+        if (/today/.test(t) && /(withdraw|spend|spent)/.test(t)) {
+            return `You've withdrawn ${fmt(getChartBreakdown('daily').withdraw)} today.`;
+        }
+        if (/(this year|year)/.test(t) && /(earn|income)/.test(t)) {
+            return `You've earned ${fmt(getChartBreakdown('yearly').earn)} this year.`;
+        }
+        if (/(this year|year)/.test(t) && /(withdraw|spend|spent)/.test(t)) {
+            return `You've withdrawn ${fmt(getChartBreakdown('yearly').withdraw)} this year.`;
+        }
+        if (/\bearn/.test(t)) {
+            const earnLogs = logs.filter(l => l.type === 'earn');
+            const total = earnLogs.reduce((s, l) => s + parseFloat(l.amount), 0);
+            return `You've earned ${fmt(total)} in total across ${earnLogs.length} ${earnLogs.length === 1 ? 'entry' : 'entries'}.`;
+        }
+        if (/withdraw|spend|spent/.test(t)) {
+            const wLogs = logs.filter(l => l.type === 'withdraw');
+            const total = wLogs.reduce((s, l) => s + parseFloat(l.amount), 0);
+            return `You've withdrawn ${fmt(total)} in total across ${wLogs.length} ${wLogs.length === 1 ? 'entry' : 'entries'}.`;
+        }
+        if (/(biggest|largest|highest)/.test(t)) {
+            if (!logs.length) return "You don't have any transactions logged yet.";
+            const top = [...logs].sort((a, b) => parseFloat(b.amount) - parseFloat(a.amount))[0];
+            return `Your biggest transaction is ${fmt(parseFloat(top.amount))} (${top.type === 'earn' ? 'earning' : 'withdrawal'}${top.note ? ' — ' + top.note : ''}) on ${top.date_stamp.split(' ')[0]}.`;
+        }
+        if (/(recent|latest|last)/.test(t)) {
+            if (!logs.length) return "You don't have any transactions logged yet.";
+            const sorted = typeof getSortedLogs === 'function' ? getSortedLogs() : logs;
+            const last = sorted[0] || logs[0];
+            return `Your most recent entry is ${last.type === 'earn' ? '+' : '-'}${fmt(parseFloat(last.amount))}${last.note ? ' — ' + last.note : ''} on ${last.date_stamp.split(' ')[0]}.`;
+        }
+        if (/(how many|count|transactions|entries)/.test(t)) {
+            return `You have ${logs.length} transaction${logs.length === 1 ? '' : 's'} logged in total.`;
+        }
+        if (/(net|profit|summary|overview)/.test(t)) {
+            const { earn, withdraw } = getChartBreakdown('monthly');
+            const net = earn - withdraw;
+            return `This month: earned ${fmt(earn)}, withdrawn ${fmt(withdraw)}, net ${net >= 0 ? '+' : ''}${fmt(net)}. Current balance: ${fmt(bal)}.`;
+        }
+        if (/(tip|advice|save|saving)/.test(t)) {
+            const { earn, withdraw } = getChartBreakdown('monthly');
+            if (earn > 0 && withdraw > earn * 0.8) {
+                return "Your withdrawals this month are close to your earnings — try setting aside a fixed percentage of each earning before you spend, even 10% adds up.";
+            }
+            return "You're keeping withdrawals well below earnings this month — nice work. Consider moving the surplus into a dedicated savings goal so it's not sitting idle.";
+        }
+
+        return "I can help with your balance, how much you've earned or withdrawn today/this month/this year, your biggest or most recent transaction, or a quick savings tip. Try asking one of those, or tap a suggestion below.";
+    }
+
+    function navTo(id, btn) { 
+        document.querySelectorAll('.view').forEach(v => v.classList.add('hidden')); 
+        document.getElementById(`view-${id}`).classList.remove('hidden');
+        document.querySelectorAll('.n-btn').forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        document.getElementById('view-title').innerText = id.toUpperCase();
+        if(id === 'home' && mainChart) {
+            // Canvas collapses to 0 size while its view is display:none;
+            // force Chart.js to recalculate its dimensions once visible again.
+            requestAnimationFrame(() => mainChart.resize());
+        }
+        if(id === 'history') {
+            filterLogs();
+            if(logsChart) requestAnimationFrame(() => logsChart.resize());
+        }
+        if(id === 'settings') {
+            populateSettingsForm();
+        }
+        if(id === 'chat') {
+            chatHistory = loadChatHistory();
+            renderChatMessages();
+        }
+    }
+
+    function openEntry(t) { 
+        activeType = t; 
+        document.getElementById('entry-title').innerText = t === 'earn' ? 'Add Earning' : 'Log Withdrawal'; 
+        // Auto-fill today's date for convenience
+        document.getElementById('entry-date').value = new Date().toISOString().split('T')[0];
+        document.getElementById('modal-entry').style.display='flex'; 
+    }
+    
+    function openDetail(id, amt, note, date) { 
+        selectedLogId = id; 
+        document.getElementById('det-amt-currency').innerText = currencySymbol;
+        document.getElementById('det-amt').value = parseFloat(amt).toFixed(2); 
+        document.getElementById('det-note').value = note; 
+        document.getElementById('det-date').value = date; 
+        document.getElementById('modal-detail').style.display='flex'; 
+    }
+    
+    function closeEntry() { document.getElementById('modal-entry').style.display='none'; document.getElementById('entry-amt').value=''; document.getElementById('entry-note').value=''; }
+    function closeDetail() { document.getElementById('modal-detail').style.display='none'; }
+    function toggleAuth() {
+        document.getElementById('login-form').classList.toggle('hidden');
+        document.getElementById('signup-form').classList.toggle('hidden');
+        // Reset the progressive login reveal so a stale password field/hint doesn't linger
+        document.getElementById('log-user').value = '';
+        document.getElementById('login-password-section').classList.add('hidden');
+        document.getElementById('login-passkey-btn').classList.add('hidden');
+        document.getElementById('login-username-hint').innerText = '';
+    }
+    function logout() { clearInterval(syncInterval); localStorage.removeItem('edgespay_session'); location.reload(); }
+</script>
+</body>
+</html>
